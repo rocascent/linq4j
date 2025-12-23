@@ -1,0 +1,28 @@
+package linq.exception;
+
+public enum ExceptionArgument {
+    collectionSelector,
+    count,
+    elementSelector,
+    enumerable,
+    first,
+    func,
+    index,
+    inner,
+    innerKeySelector,
+    keySelector,
+    outer,
+    outerKeySelector,
+    predicate,
+    resultSelector,
+    second,
+    seedSelector,
+    selector,
+    source,
+    third,
+    size,
+    other,
+    start,
+    step,
+    endInclusive,
+}

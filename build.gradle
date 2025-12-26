@@ -1,5 +1,5 @@
 plugins {
-    id 'java-library'
+    id 'org.jetbrains.kotlin.jvm' version '2.2.21'
 }
 
 group = 'com.rocascent'
@@ -9,9 +9,17 @@ repositories {
     mavenCentral()
 }
 
+java {
+    toolchain {
+        sourceCompatibility = JavaLanguageVersion.of(24)
+        targetCompatibility = JavaLanguageVersion.of(24)
+    }
+}
+
 dependencies {
     testImplementation platform('org.junit:junit-bom:5.10.0')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.0'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 

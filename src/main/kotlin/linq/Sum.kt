@@ -13,79 +13,79 @@ fun <TSource> sum(source: Enumerable<TSource>?, selector: ((TSource) -> Int)?): 
         throwArgumentNullException(ExceptionArgument.selector)
     }
 
-    var sum = 0;
+    var sum = 0
     for (value in source) {
-        sum += selector(value);
+        sum += selector(value)
     }
 
-    return sum;
+    return sum
 }
 
 fun <TSource> sum(source: Enumerable<TSource>?, selector: ((TSource) -> Long)?): Long {
     if (source == null) {
-        throwArgumentNullException(ExceptionArgument.source);
+        throwArgumentNullException(ExceptionArgument.source)
     }
 
     if (selector == null) {
         throwArgumentNullException(ExceptionArgument.selector)
     }
 
-    var sum = 0L;
+    var sum = 0L
     for (value in source) {
-        sum += selector(value);
+        sum += selector(value)
     }
 
-    return sum;
+    return sum
 }
 
 fun <TSource> sum(source: Enumerable<TSource>?, selector: ((TSource) -> Float)?): Float {
     if (source == null) {
-        throwArgumentNullException(ExceptionArgument.source);
+        throwArgumentNullException(ExceptionArgument.source)
     }
 
     if (selector == null) {
         throwArgumentNullException(ExceptionArgument.selector)
     }
 
-    var sum = 0f;
+    var sum = 0f
     for (value in source) {
-        sum += selector(value);
+        sum += selector(value)
     }
 
-    return sum;
+    return sum
 }
 
 fun <TSource> sum(source: Enumerable<TSource>?, selector: ((TSource) -> Double)?): Double {
     if (source == null) {
-        throwArgumentNullException(ExceptionArgument.source);
+        throwArgumentNullException(ExceptionArgument.source)
     }
 
     if (selector == null) {
         throwArgumentNullException(ExceptionArgument.selector)
     }
 
-    var sum = 0.0;
+    var sum = 0.0
     for (value in source) {
-        sum += selector(value);
+        sum += selector(value)
     }
 
-    return sum;
+    return sum
 }
 
 fun <TSource> sum(source: Enumerable<TSource>?, selector: ((TSource) -> BigDecimal)?): BigDecimal {
     if (source == null) {
-        throwArgumentNullException(ExceptionArgument.source);
+        throwArgumentNullException(ExceptionArgument.source)
     }
 
     if (selector == null) {
         throwArgumentNullException(ExceptionArgument.selector)
     }
 
-    var sum = BigDecimal.ZERO;
+    var sum = BigDecimal.ZERO
     for (value in source) {
-        sum += selector(value);
+        sum += selector(value)
     }
 
-    return sum;
+    return sum
 }
 

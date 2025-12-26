@@ -12,12 +12,12 @@ fun <TSource> tryGetLastNonIterator(source: Enumerable<TSource>): TSource? {
         source.enumerator().use {
 
             if (it.moveNext()) {
-                var result: TSource;
+                var result: TSource
                 do {
-                    result = it.current;
-                } while (it.moveNext());
+                    result = it.current
+                } while (it.moveNext())
 
-                return result;
+                return result
             }
         }
     }

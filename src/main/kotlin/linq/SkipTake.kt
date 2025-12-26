@@ -110,7 +110,7 @@ class EnumerableSkipTakeIterator<TSource>(
 
         source.enumerator().use {
             val count = skipAndCount(maxIndexInclusive.toUInt() + 1u, it)
-            assert(count != Int.MAX_VALUE.toUInt() + 1u || minIndexInclusive > 0) { "Our return value will be incorrect." };
+            assert(count != Int.MAX_VALUE.toUInt() + 1u || minIndexInclusive > 0) { "Our return value will be incorrect." }
             return max(count.toInt() - minIndexInclusive, 0)
         }
     }
@@ -176,7 +176,7 @@ class EnumerableSkipTakeIterator<TSource>(
     }
 
     override fun tryGetFirst(): TSource? {
-        assert(!hasLimit || limit > 0);
+        assert(!hasLimit || limit > 0)
 
         if (source is AbstractIterator<TSource>) {
             return source.tryGetElementAt(minIndexInclusive)

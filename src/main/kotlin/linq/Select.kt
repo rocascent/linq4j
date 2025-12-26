@@ -115,7 +115,7 @@ internal class ArraySelectIterator<TSource, TResult>(
         if (index.toUInt() < source.size.toUInt()) {
             return selector(source[index])
         }
-        return null;
+        return null
     }
 
     override fun tryGetFirst(): TResult {
@@ -268,7 +268,7 @@ class ArraySkipTakeSelectIterator<TSource, TResult>(
 
         var sourceIndex = minIndexInclusive
         val list = arrayListOf<TResult>()
-        for (i in 0 until count) {
+        repeat(count) {
             list.add(selector(source[sourceIndex]))
             sourceIndex++
         }

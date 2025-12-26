@@ -1,7 +1,7 @@
 package linq.exception;
 
 object SR {
-    const val Arg_ArgumentException = "Value does not fall within the expected range.";
+    const val Arg_ArgumentException = "Value does not fall within the expected range."
     const val Arg_ParamName_Name = "Parameter name: %s."
     const val ArgumentNull_Generic = "Value cannot be null."
     const val Arg_ArgumentOutOfRangeException = "Specified argument was out of the range of valid values."

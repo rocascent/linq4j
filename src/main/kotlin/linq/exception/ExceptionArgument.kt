@@ -1,4 +1,4 @@
-package linq.exception;
+package linq.exception
 
 enum class ExceptionArgument {
     collectionSelector,

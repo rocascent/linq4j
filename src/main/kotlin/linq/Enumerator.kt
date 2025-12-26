@@ -1,4 +1,4 @@
-package linq;
+package linq
 
 interface Enumerator<out TSource> : AutoCloseable {
     val current: TSource

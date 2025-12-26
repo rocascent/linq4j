@@ -55,11 +55,11 @@ private fun <TSource> skipWhileIterator(
     sequence {
         source.enumerator().use {
             while (it.moveNext()) {
-                val element = it.current;
+                val element = it.current
                 if (!predicate(element)) {
-                    yield(element);
+                    yield(element)
                     while (it.moveNext()) {
-                        yield(it.current);
+                        yield(it.current)
                     }
 
                     return@sequence
@@ -89,14 +89,14 @@ private fun <TSource> skipWhileIterator(
 ): Sequence<TSource> =
     sequence {
         source.enumerator().use {
-            var index = -1;
+            var index = -1
             while (it.moveNext()) {
                 index++
-                val element = it.current;
+                val element = it.current
                 if (!predicate(element, index)) {
-                    yield(element);
+                    yield(element)
                     while (it.moveNext()) {
-                        yield(it.current);
+                        yield(it.current)
                     }
 
                     return@sequence

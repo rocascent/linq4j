@@ -1,9 +1,9 @@
-package linq.collections.enumerator;
+package linq.collections.enumerator
 
-import linq.Enumerator;
+import linq.Enumerator
 
 class IterableEnumerator<T>(iterable: Iterable<T>) : Enumerator<T> {
-    private val iterator: Iterator<T> = iterable.iterator();
+    private val iterator: Iterator<T> = iterable.iterator()
     private var _current: T? = null
 
     override val current: T
@@ -13,9 +13,9 @@ class IterableEnumerator<T>(iterable: Iterable<T>) : Enumerator<T> {
     @Override
     override fun moveNext(): Boolean {
         if (iterator.hasNext()) {
-            _current = iterator.next();
-            return true;
+            _current = iterator.next()
+            return true
         }
-        return false;
+        return false
     }
 }

@@ -46,11 +46,11 @@ private fun <TSource, TResult> selectManyIterator(
     source: Enumerable<TSource>,
     selector: (TSource, Int) -> Iterable<TResult>
 ): Sequence<TResult> = sequence {
-    var index = -1;
+    var index = -1
     for (element in source) {
-        index++;
+        index++
         for (subElement in selector(element, index)) {
-            yield(subElement);
+            yield(subElement)
         }
     }
 }
@@ -84,11 +84,11 @@ private fun <TSource, TCollection, TResult> selectManyIterator(
     collectionSelector: (TSource, Int) -> Iterable<TCollection>,
     resultSelector: (TSource, TCollection) -> TResult
 ): Sequence<TResult> = sequence {
-    var index = -1;
+    var index = -1
     for (element in source) {
-        index++;
+        index++
         for (subElement in collectionSelector(element, index)) {
-            yield(resultSelector(element, subElement));
+            yield(resultSelector(element, subElement))
         }
     }
 }
@@ -124,7 +124,7 @@ private fun <TSource, TCollection, TResult> selectManyIterator(
 ): Sequence<TResult> = sequence {
     for (element in source) {
         for (subElement in collectionSelector(element)) {
-            yield(resultSelector(element, subElement));
+            yield(resultSelector(element, subElement))
         }
     }
 }

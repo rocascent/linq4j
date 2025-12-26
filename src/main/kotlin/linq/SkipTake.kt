@@ -65,7 +65,7 @@ class ArraySkipTakeIterator<TSource>(
         val list = arrayListOf<TSource>()
         if (count != 0) {
             var sourceIndex = minIndexInclusive
-            for (i in 0 until count) {
+            repeat(count) {
                 list.add(source[sourceIndex])
                 sourceIndex++
             }

@@ -1,4 +1,4 @@
-package linq.exception;
+package linq.exception
 
 object SR {
     const val Arg_ArgumentException = "Value does not fall within the expected range."

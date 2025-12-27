@@ -1,7 +1,7 @@
 package linq.exception
 
 fun throwArgumentNullException(argument: ExceptionArgument): Nothing {
-    throw NullPointerException(argument.name + " is null")
+    throw NullPointerException(argument.string + " is null")
 }
 
 fun throwNoElementsException(): Nothing {

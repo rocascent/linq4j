@@ -38,7 +38,7 @@ fun <TSource> firstOrDefault(
 
 private fun <TSource> tryGetFirst(source: Enumerable<TSource>?): TSource? {
     if (source == null) {
-        throwArgumentNullException(ExceptionArgument.source)
+        throwArgumentNullException(ExceptionArgument.Source)
     }
     if (source is AbstractIterator<TSource>) {
         return source.tryGetFirst()
@@ -63,11 +63,11 @@ fun <TSource> tryGetFirstNonIterator(source: Enumerable<TSource>): TSource? {
 
 fun <TSource> tryGetFirst(source: Enumerable<TSource>?, predicate: ((TSource) -> Boolean)?): TSource? {
     if (source == null) {
-        throwArgumentNullException(ExceptionArgument.source)
+        throwArgumentNullException(ExceptionArgument.Source)
     }
 
     if (predicate == null) {
-        throwArgumentNullException(ExceptionArgument.predicate)
+        throwArgumentNullException(ExceptionArgument.Predicate)
     }
 
     for (element in source) {

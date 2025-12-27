@@ -9,10 +9,10 @@ import kotlin.math.min
 
 fun <TSource, TResult> select(source: Enumerable<TSource>?, selector: ((TSource) -> TResult)?): Enumerable<TResult> {
     if (source == null) {
-        throwArgumentNullException(ExceptionArgument.source)
+        throwArgumentNullException(ExceptionArgument.Source)
     }
     if (selector == null) {
-        throwArgumentNullException(ExceptionArgument.selector)
+        throwArgumentNullException(ExceptionArgument.Selector)
     }
 
     if (source is AbstractIterator<TSource>) {
@@ -32,11 +32,11 @@ fun <TSource, TResult> select(
     selector: ((TSource, Int) -> TResult)?
 ): Enumerable<TResult> {
     if (source == null) {
-        throwArgumentNullException(ExceptionArgument.source)
+        throwArgumentNullException(ExceptionArgument.Source)
     }
 
     if (selector == null) {
-        throwArgumentNullException(ExceptionArgument.selector)
+        throwArgumentNullException(ExceptionArgument.Selector)
     }
 
     if (isEmptyArray(source)) {
@@ -71,7 +71,7 @@ internal class ArraySelectIterator<TSource, TResult>(
         val index = state - 1
         if (index < source.size) {
             state++
-            currentField = selector(source[index])
+            current = selector(source[index])
             return true
         }
 
@@ -127,6 +127,16 @@ internal class ArraySelectIterator<TSource, TResult>(
         assert(source.size > 0)
         return selector(source[source.size - 1])
     }
+
+    override fun itContains(value: TResult): Boolean {
+        for (element in source) {
+            if (selector(element) == value) {
+                return true
+            }
+        }
+
+        return false
+    }
 }
 
 internal class EnumerableSelectIterator<TSource, TResult>(
@@ -155,9 +165,10 @@ internal class EnumerableSelectIterator<TSource, TResult>(
                 }
 
                 2 -> {
-                    assert(enumerator != null)
-                    if (enumerator!!.moveNext()) {
-                        currentField = selector(enumerator!!.current)
+                    val enumerator = enumerator
+                    enumerator.assertNotNull()
+                    if (enumerator.moveNext()) {
+                        current = selector(enumerator.current)
                         return true
                     }
 
@@ -169,9 +180,8 @@ internal class EnumerableSelectIterator<TSource, TResult>(
         return false
     }
 
-    override fun <TResult2> itSelect(selector: (TResult) -> TResult2): Enumerable<TResult2> {
-        return EnumerableSelectIterator(source, this.selector.then(selector))
-    }
+    override fun <TResult2> itSelect(selector: (TResult) -> TResult2): Enumerable<TResult2> =
+        EnumerableSelectIterator(source, this.selector.then(selector))
 
     override fun getList(): List<TResult> {
         return source.mapTo(arrayListOf(), selector)
@@ -188,6 +198,23 @@ internal class EnumerableSelectIterator<TSource, TResult>(
         return count
     }
 
+    override fun tryGetElementAt(index: Int): TResult? {
+        var index = index
+        if (index >= 0) {
+            source.enumerator().use {
+                while (it.moveNext()) {
+                    if (index == 0) {
+                        return selector(it.current)
+                    }
+
+                    index--
+                }
+            }
+        }
+
+        return null
+    }
+
     override fun tryGetFirst(): TResult? {
         source.enumerator().use {
             if (it.moveNext()) {
@@ -195,6 +222,22 @@ internal class EnumerableSelectIterator<TSource, TResult>(
             }
             return null
         }
+    }
+
+    override fun tryGetLast(): TResult? {
+        source.enumerator().use {
+            if (it.moveNext()) {
+                var last = it.current
+
+                while (it.moveNext()) {
+                    last = it.current
+                }
+
+                return selector(last)
+            }
+        }
+
+        return null
     }
 }
 
@@ -215,8 +258,10 @@ class ArraySkipTakeSelectIterator<TSource, TResult>(
 
     override fun moveNext(): Boolean {
         val index = state - 1
-        if (index <= maxIndexInclusive - minIndexInclusive && index < source.size - minIndexInclusive) {
-            currentField = selector(source[minIndexInclusive + index])
+        if (index.toUInt() <= (maxIndexInclusive - minIndexInclusive).toUInt() &&
+            index < source.size - minIndexInclusive
+        ) {
+            current = selector(source[minIndexInclusive + index])
             ++state
             return true
         }
@@ -225,29 +270,57 @@ class ArraySkipTakeSelectIterator<TSource, TResult>(
         return false
     }
 
-    override fun <TResult2> itSelect(selector: (TResult) -> TResult2): Enumerable<TResult2> {
-        return ArraySkipTakeSelectIterator(
+    override fun <TResult2> itSelect(selector: (TResult) -> TResult2): Enumerable<TResult2> =
+        ArraySkipTakeSelectIterator(
             source,
             this.selector.then(selector),
             minIndexInclusive,
             maxIndexInclusive
         )
-    }
 
     override fun itSkip(count: Int): AbstractIterator<TResult>? {
         assert(count > 0)
         val minIndex = minIndexInclusive + count
-        return if (minIndex > maxIndexInclusive) {
+        return if (minIndex.toUInt() > maxIndexInclusive.toUInt()) {
             null
         } else {
             ArraySkipTakeSelectIterator(source, selector, minIndex, maxIndexInclusive)
         }
     }
 
+    override fun itTake(count: Int): AbstractIterator<TResult>? {
+        assert(count > 0)
+        val maxIndex = minIndexInclusive + count - 1
+        return if (maxIndex.toUInt() >= maxIndexInclusive.toUInt()) {
+            this
+        } else {
+            ArraySkipTakeSelectIterator(source, selector, minIndexInclusive, maxIndex)
+        }
+    }
+
+    override fun tryGetElementAt(index: Int): TResult? {
+        if (index.toUInt() <= (maxIndexInclusive - minIndexInclusive).toUInt() &&
+            index < source.size - minIndexInclusive
+        ) {
+            return selector(source[minIndexInclusive + index])
+        }
+
+        return null
+    }
+
     override fun tryGetFirst(): TResult? {
         if (source.size > minIndexInclusive) {
             return selector(source[minIndexInclusive])
         }
+        return null
+    }
+
+    override fun tryGetLast(): TResult? {
+        val lastIndex = source.size - 1
+        if (lastIndex >= minIndexInclusive) {
+            return selector(source[min(lastIndex, maxIndexInclusive)])
+        }
+
         return null
     }
 
@@ -285,5 +358,14 @@ class ArraySkipTakeSelectIterator<TSource, TResult>(
         }
 
         return count
+    }
+
+    override fun itContains(value: TResult): Boolean {
+        val count = count
+
+        val end = minIndexInclusive + count
+
+        return (minIndexInclusive until end)
+            .any { selector(source[it]) == value }
     }
 }

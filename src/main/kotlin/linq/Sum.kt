@@ -6,11 +6,11 @@ import java.math.BigDecimal
 
 fun <TSource> sum(source: Enumerable<TSource>?, selector: ((TSource) -> Int)?): Int {
     if (source == null) {
-        throwArgumentNullException(ExceptionArgument.source)
+        throwArgumentNullException(ExceptionArgument.Source)
     }
 
     if (selector == null) {
-        throwArgumentNullException(ExceptionArgument.selector)
+        throwArgumentNullException(ExceptionArgument.Selector)
     }
 
     var sum = 0
@@ -23,11 +23,11 @@ fun <TSource> sum(source: Enumerable<TSource>?, selector: ((TSource) -> Int)?): 
 
 fun <TSource> sum(source: Enumerable<TSource>?, selector: ((TSource) -> Long)?): Long {
     if (source == null) {
-        throwArgumentNullException(ExceptionArgument.source)
+        throwArgumentNullException(ExceptionArgument.Source)
     }
 
     if (selector == null) {
-        throwArgumentNullException(ExceptionArgument.selector)
+        throwArgumentNullException(ExceptionArgument.Selector)
     }
 
     var sum = 0L
@@ -40,14 +40,14 @@ fun <TSource> sum(source: Enumerable<TSource>?, selector: ((TSource) -> Long)?):
 
 fun <TSource> sum(source: Enumerable<TSource>?, selector: ((TSource) -> Float)?): Float {
     if (source == null) {
-        throwArgumentNullException(ExceptionArgument.source)
+        throwArgumentNullException(ExceptionArgument.Source)
     }
 
     if (selector == null) {
-        throwArgumentNullException(ExceptionArgument.selector)
+        throwArgumentNullException(ExceptionArgument.Selector)
     }
 
-    var sum = 0f
+    var sum = 0.0f
     for (value in source) {
         sum += selector(value)
     }
@@ -57,11 +57,11 @@ fun <TSource> sum(source: Enumerable<TSource>?, selector: ((TSource) -> Float)?)
 
 fun <TSource> sum(source: Enumerable<TSource>?, selector: ((TSource) -> Double)?): Double {
     if (source == null) {
-        throwArgumentNullException(ExceptionArgument.source)
+        throwArgumentNullException(ExceptionArgument.Source)
     }
 
     if (selector == null) {
-        throwArgumentNullException(ExceptionArgument.selector)
+        throwArgumentNullException(ExceptionArgument.Selector)
     }
 
     var sum = 0.0
@@ -74,11 +74,11 @@ fun <TSource> sum(source: Enumerable<TSource>?, selector: ((TSource) -> Double)?
 
 fun <TSource> sum(source: Enumerable<TSource>?, selector: ((TSource) -> BigDecimal)?): BigDecimal {
     if (source == null) {
-        throwArgumentNullException(ExceptionArgument.source)
+        throwArgumentNullException(ExceptionArgument.Source)
     }
 
     if (selector == null) {
-        throwArgumentNullException(ExceptionArgument.selector)
+        throwArgumentNullException(ExceptionArgument.Selector)
     }
 
     var sum = BigDecimal.ZERO

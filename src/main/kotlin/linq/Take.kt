@@ -7,7 +7,7 @@ import linq.exception.throwArgumentNullException
 
 fun <TSource> take(source: Enumerable<TSource>?, count: Int): Enumerable<TSource> {
     if (source == null) {
-        throwArgumentNullException(ExceptionArgument.source)
+        throwArgumentNullException(ExceptionArgument.Source)
     }
 
     if (count <= 0 || isEmptyArray(source)) {

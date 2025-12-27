@@ -248,19 +248,19 @@ public class JavaTest {
         );
 
         // 测试 sumInt
-        int intSum = items.sumInt(Item::getValue);
+        int intSum = items.sumInt(Item::value);
         Assertions.assertEquals(60, intSum);
 
         // 测试 sumLong
-        long longSum = items.sumLong(item -> (long) item.getValue());
+        long longSum = items.sumLong(item -> (long) item.value());
         Assertions.assertEquals(60L, longSum);
 
         // 测试 sumDouble
-        double doubleSum = items.sumDouble(item -> (double) item.getValue() * 1.5);
+        double doubleSum = items.sumDouble(item -> (double) item.value() * 1.5);
         Assertions.assertEquals(90.0, doubleSum, 0.001);
 
         // 测试 sumFloat
-        float floatSum = items.sumFloat(item -> (float) item.getValue() * 0.5f);
+        float floatSum = items.sumFloat(item -> (float) item.value() * 0.5f);
         Assertions.assertEquals(30.0f, floatSum, 0.001);
     }
 
@@ -298,22 +298,7 @@ public class JavaTest {
     }
 
     // 辅助类用于测试
-    private static class Item {
-        private final String name;
-        private final int value;
-
-        public Item(String name, int value) {
-            this.name = name;
-            this.value = value;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public int getValue() {
-            return value;
-        }
+    private record Item(String name, int value) {
     }
 
     @Test

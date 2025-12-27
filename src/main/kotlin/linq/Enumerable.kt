@@ -34,6 +34,76 @@ abstract class Enumerable<TSource> : Iterable<TSource> {
         return IteratorAdapter(enumerator())
     }
 
+    /**
+     * Applies an accumulator function over a sequence.
+     * @param [func] An accumulator function to be invoked on each element.
+     * @return The final accumulator value.
+     * @throws [NullPointerException] source or [func] is null.
+     * @throws [IllegalStateException] source contains no elements.
+     */
+    fun aggregate(func: ((TSource, TSource) -> TSource)): TSource = aggregate(this, func)
+
+    /**
+     * Applies an accumulator function over a sequence. The specified seed value is used as the initial accumulator value.
+     * @param [seed] The initial accumulator value.
+     * @param [func] An accumulator function to be invoked on each element.
+     * @return The final accumulator value.
+     * @throws [NullPointerException] source or [func] is null.
+     */
+    fun <TAccumulate> aggregate(seed: TAccumulate, func: ((TAccumulate, TSource) -> TAccumulate)): TAccumulate =
+        aggregate(this, seed, func)
+
+    /**
+     * Applies an accumulator function over a sequence. The specified seed value is used as the initial accumulator value, and the specified function is used to select the result value.
+     * @param [seed] The initial accumulator value.
+     * @param [func] An accumulator function to be invoked on each element.
+     * @param [resultSelector] A function to transform the final accumulator value into the result value.
+     * @return The transformed final accumulator value.
+     * @throws [NullPointerException] source or [func] or [resultSelector] is null.
+     */
+    fun <TAccumulate, TResult> aggregate(
+        seed: TAccumulate,
+        func: ((TAccumulate, TSource) -> TAccumulate),
+        resultSelector: (TAccumulate) -> TResult
+    ): TResult = aggregate(this, seed, func, resultSelector)
+
+    /**
+     * Applies an accumulator function over a sequence, grouping results by key.
+     * @param [keySelector] A function to extract the key for each element.
+     * @param [seed] The initial accumulator value.
+     * @param [func] An accumulator function to be invoked on each element.
+     * @param [keyComparer] An [EqualityComparer] to compare keys with.
+     * @return An enumerable containing the aggregates corresponding to each key deriving from source.
+     */
+    fun <TKey, TAccumulate> aggregateBy(
+        keySelector: (TSource) -> TKey,
+        seed: TAccumulate,
+        func: (TAccumulate, TSource) -> TAccumulate,
+        keyComparer: EqualityComparer<TKey>? = null
+    ): Enumerable<Map.Entry<TKey, TAccumulate>> = aggregateBy(this, keySelector, seed, func, keyComparer)
+
+
+    /**
+     * Applies an accumulator function over a sequence, grouping results by key.
+     * @param [keySelector] A function to extract the key for each element.
+     * @param [seedSelector] A factory for the initial accumulator value.
+     * @param [func] An accumulator function to be invoked on each element.
+     * @param [keyComparer] An [EqualityComparer] to compare keys with.
+     * @return An enumerable containing the aggregates corresponding to each key deriving from source.
+     */
+    fun <TKey, TAccumulate> aggregateBy(
+        keySelector: (TSource) -> TKey,
+        seedSelector: (TKey) -> TAccumulate,
+        func: (TAccumulate, TSource) -> TAccumulate,
+        keyComparer: EqualityComparer<TKey>? = null
+    ): Enumerable<Map.Entry<TKey, TAccumulate>> = aggregateBy(this, keySelector, seedSelector, func, keyComparer)
+
+    fun any(): Boolean = any(this)
+
+    fun any(predicate: ((TSource) -> Boolean)): Boolean = any(this, predicate)
+
+    fun all(predicate: ((TSource) -> Boolean)): Boolean = all(this, predicate)
+
     fun count(): Int = count(this)
 
     fun count(predicate: (TSource) -> Boolean): Int = count(this, predicate)
@@ -45,7 +115,6 @@ abstract class Enumerable<TSource> : Iterable<TSource> {
 
     /**
      * Returns the first element of a sequence.
-     *
      * @return The first element in the specified sequence.
      * @throws [NullPointerException]  source is null.
      * @throws [IllegalStateException] The source sequence is empty.

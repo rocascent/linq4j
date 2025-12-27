@@ -6,7 +6,7 @@ import linq.exception.throwArgumentNullException
 
 fun <TSource> count(source: Enumerable<TSource>?): Int {
     if (source == null) {
-        throwArgumentNullException(ExceptionArgument.source)
+        throwArgumentNullException(ExceptionArgument.Source)
     }
 
     if (source is ArrayEnumerable<TSource>) {
@@ -16,7 +16,6 @@ fun <TSource> count(source: Enumerable<TSource>?): Int {
     if (source is AbstractIterator<TSource>) {
         return source.itCount()
     }
-
 
     var count = 0
     source.enumerator().use {
@@ -29,11 +28,11 @@ fun <TSource> count(source: Enumerable<TSource>?): Int {
 
 fun <TSource> count(source: Enumerable<TSource>?, predicate: ((TSource) -> Boolean)?): Int {
     if (source == null) {
-        throwArgumentNullException(ExceptionArgument.source)
+        throwArgumentNullException(ExceptionArgument.Source)
     }
 
     if (predicate == null) {
-        throwArgumentNullException(ExceptionArgument.predicate)
+        throwArgumentNullException(ExceptionArgument.Predicate)
     }
 
     var count = 0
@@ -47,7 +46,7 @@ fun <TSource> count(source: Enumerable<TSource>?, predicate: ((TSource) -> Boole
 
 fun <TSource> longCount(source: Enumerable<TSource>?): Long {
     if (source == null) {
-        throwArgumentNullException(ExceptionArgument.source)
+        throwArgumentNullException(ExceptionArgument.Source)
     }
 
     var count = 0L
@@ -61,11 +60,11 @@ fun <TSource> longCount(source: Enumerable<TSource>?): Long {
 
 fun <TSource> longCount(source: Enumerable<TSource>?, predicate: ((TSource) -> Boolean)?): Long {
     if (source == null) {
-        throwArgumentNullException(ExceptionArgument.source)
+        throwArgumentNullException(ExceptionArgument.Source)
     }
 
     if (predicate == null) {
-        throwArgumentNullException(ExceptionArgument.predicate)
+        throwArgumentNullException(ExceptionArgument.Predicate)
     }
 
     var count = 0L

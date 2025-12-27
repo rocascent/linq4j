@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test
 class KotlinTest {
     @Test
     fun test() {
-        fibonacciSequence().takeWhile { it < 100 }.forEach { println(it) }
+        fibonacciSequence().filter { it > 7 }.map { it }.map { it }.forEach { println(it) }
     }
 
     fun fibonacciSequence(): Sequence<Int> = sequence {

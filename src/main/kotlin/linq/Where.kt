@@ -8,11 +8,11 @@ import linq.exception.throwArgumentNullException
 
 fun <TSource> where(source: Enumerable<TSource>?, predicate: ((TSource) -> Boolean)?): Enumerable<TSource> {
     if (source == null) {
-        throwArgumentNullException(ExceptionArgument.source)
+        throwArgumentNullException(ExceptionArgument.Source)
     }
 
     if (predicate == null) {
-        throwArgumentNullException(ExceptionArgument.predicate)
+        throwArgumentNullException(ExceptionArgument.Predicate)
     }
 
     if (source is AbstractIterator<TSource>) {
@@ -32,11 +32,11 @@ fun <TSource> where(source: Enumerable<TSource>?, predicate: ((TSource) -> Boole
 
 fun <TSource> where(source: Enumerable<TSource>?, predicate: ((TSource, Int) -> Boolean)?): Enumerable<TSource> {
     if (source == null) {
-        throwArgumentNullException(ExceptionArgument.source)
+        throwArgumentNullException(ExceptionArgument.Source)
     }
 
     if (predicate == null) {
-        throwArgumentNullException(ExceptionArgument.predicate)
+        throwArgumentNullException(ExceptionArgument.Predicate)
     }
 
     if (isEmptyArray(source)) {
@@ -77,7 +77,7 @@ class ArrayWhereIterator<TSource>(
             val item = source[index]
             index = state++
             if (predicate(item)) {
-                currentField = item
+                current = item
                 return true
             }
         }
@@ -143,11 +143,12 @@ class EnumerableWhereIterator<TSource>(
                 }
 
                 2 -> {
-                    assert(enumerator != null)
-                    while (enumerator!!.moveNext()) {
-                        val item = enumerator!!.current
+                    val enumerator = enumerator
+                    enumerator.assertNotNull()
+                    while (enumerator.moveNext()) {
+                        val item = enumerator.current
                         if (predicate(item)) {
-                            currentField = item
+                            current = item
                             return true
                         }
                     }
@@ -215,7 +216,7 @@ class ArrayWhereSelectIterator<TSource, TResult>(
             val item = source[index]
             index = state++
             if (predicate(item)) {
-                currentField = selector(item)
+                current = selector(item)
                 return true
             }
         }
@@ -279,11 +280,12 @@ class EnumerableWhereSelectIterator<TSource, TResult>(
                 }
 
                 2 -> {
-                    assert(enumerator != null)
-                    while (enumerator!!.moveNext()) {
-                        val item = enumerator!!.current
+                    val enumerator = enumerator
+                    enumerator.assertNotNull()
+                    while (enumerator.moveNext()) {
+                        val item = enumerator.current
                         if (predicate(item)) {
-                            currentField = selector(item)
+                            current = selector(item)
                             return true
                         }
                     }

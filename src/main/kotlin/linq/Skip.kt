@@ -9,7 +9,7 @@ import linq.exception.throwArgumentNullException
 fun <TSource> skip(source: Enumerable<TSource>?, count: Int): Enumerable<TSource> {
     var count = count
     if (source == null) {
-        throwArgumentNullException(ExceptionArgument.source)
+        throwArgumentNullException(ExceptionArgument.Source)
     }
 
     if (isEmptyArray(source)) {
@@ -35,10 +35,10 @@ fun <TSource> skip(source: Enumerable<TSource>?, count: Int): Enumerable<TSource
 
 fun <TSource> skipWhile(source: Enumerable<TSource>?, predicate: ((TSource) -> Boolean)?): Enumerable<TSource> {
     if (source == null) {
-        throwArgumentNullException(ExceptionArgument.source)
+        throwArgumentNullException(ExceptionArgument.Source)
     }
     if (predicate == null) {
-        throwArgumentNullException(ExceptionArgument.predicate)
+        throwArgumentNullException(ExceptionArgument.Predicate)
     }
 
     if (isEmptyArray(source)) {
@@ -70,10 +70,10 @@ private fun <TSource> skipWhileIterator(
 
 fun <TSource> skipWhile(source: Enumerable<TSource>?, predicate: ((TSource, Int) -> Boolean)?): Enumerable<TSource> {
     if (source == null) {
-        throwArgumentNullException(ExceptionArgument.source)
+        throwArgumentNullException(ExceptionArgument.Source)
     }
     if (predicate == null) {
-        throwArgumentNullException(ExceptionArgument.predicate)
+        throwArgumentNullException(ExceptionArgument.Predicate)
     }
 
     if (isEmptyArray(source)) {

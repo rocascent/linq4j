@@ -3,14 +3,18 @@ package linq
 abstract class AbstractIterator<TSource> : Enumerable<TSource>(), Enumerator<TSource> {
     private val threadId = Thread.currentThread().threadId()
     protected var state = 0
-    protected var currentField: TSource? = null
+    private var backingCurrent: TSource? = null
 
-    override val current: TSource get() = currentField ?: throw IllegalStateException()
+    override var current: TSource
+        get() = backingCurrent ?: throw IllegalStateException()
+        set(value) {
+            backingCurrent = value
+        }
 
     protected abstract fun clone(): AbstractIterator<TSource>
 
     override fun close() {
-        currentField = null
+        backingCurrent = null
         state = -1
     }
 
@@ -28,11 +32,6 @@ abstract class AbstractIterator<TSource> : Enumerable<TSource>(), Enumerator<TSo
     open fun itWhere(predicate: (TSource) -> Boolean): Enumerable<TSource> =
         EnumerableWhereIterator(this, predicate)
 
-    //    @Override
-    //    public void reset() {
-    //        throw new UnsupportedOperationException()
-    //    }
-
     abstract fun getList(): List<TSource>
 
     abstract fun itCount(): Int
@@ -49,11 +48,12 @@ abstract class AbstractIterator<TSource> : Enumerable<TSource>(), Enumerator<TSo
         if (index == 0) {
             tryGetFirst()
         } else {
-            //todo
-            null
+            tryGetElementAtNonIterator(this, index)
         }
 
     open fun tryGetFirst(): TSource? = tryGetFirstNonIterator(this)
 
     open fun tryGetLast(): TSource? = tryGetLastNonIterator(this)
+
+    open fun itContains(value: TSource): Boolean = containsIterate(this, value, null)
 }

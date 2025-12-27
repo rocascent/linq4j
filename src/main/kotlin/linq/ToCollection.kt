@@ -5,7 +5,7 @@ import linq.exception.throwArgumentNullException
 
 fun <TSource> toList(source: Enumerable<TSource>?): List<TSource> {
     if (source == null) {
-        throwArgumentNullException(ExceptionArgument.source)
+        throwArgumentNullException(ExceptionArgument.Source)
     }
 
     if (source is AbstractIterator<TSource>) {

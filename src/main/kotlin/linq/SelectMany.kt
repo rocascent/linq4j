@@ -10,11 +10,11 @@ fun <TSource, TResult> selectMany(
     selector: ((TSource) -> Iterable<TResult>)?
 ): Enumerable<TResult> {
     if (source == null) {
-        throwArgumentNullException(ExceptionArgument.source)
+        throwArgumentNullException(ExceptionArgument.Source)
     }
 
     if (selector == null) {
-        throwArgumentNullException(ExceptionArgument.selector)
+        throwArgumentNullException(ExceptionArgument.Selector)
     }
 
     if (isEmptyArray(source)) {
@@ -28,11 +28,11 @@ fun <TSource, TResult> selectMany(
     selector: ((TSource, Int) -> Iterable<TResult>)?
 ): Enumerable<TResult> {
     if (source == null) {
-        throwArgumentNullException(ExceptionArgument.source)
+        throwArgumentNullException(ExceptionArgument.Source)
     }
 
     if (selector == null) {
-        throwArgumentNullException(ExceptionArgument.selector)
+        throwArgumentNullException(ExceptionArgument.Selector)
     }
 
     if (isEmptyArray(source)) {
@@ -61,15 +61,15 @@ fun <TSource, TCollection, TResult> selectMany(
     resultSelector: ((TSource, TCollection) -> TResult)?
 ): Enumerable<TResult> {
     if (source == null) {
-        throwArgumentNullException(ExceptionArgument.source)
+        throwArgumentNullException(ExceptionArgument.Source)
     }
 
     if (collectionSelector == null) {
-        throwArgumentNullException(ExceptionArgument.collectionSelector)
+        throwArgumentNullException(ExceptionArgument.CollectionSelector)
     }
 
     if (resultSelector == null) {
-        throwArgumentNullException(ExceptionArgument.resultSelector)
+        throwArgumentNullException(ExceptionArgument.ResultSelector)
     }
 
     if (isEmptyArray(source)) {
@@ -99,15 +99,15 @@ fun <TSource, TCollection, TResult> selectMany(
     resultSelector: ((TSource, TCollection) -> TResult)?
 ): Enumerable<TResult> {
     if (source == null) {
-        throwArgumentNullException(ExceptionArgument.source)
+        throwArgumentNullException(ExceptionArgument.Source)
     }
 
     if (collectionSelector == null) {
-        throwArgumentNullException(ExceptionArgument.collectionSelector)
+        throwArgumentNullException(ExceptionArgument.CollectionSelector)
     }
 
     if (resultSelector == null) {
-        throwArgumentNullException(ExceptionArgument.resultSelector)
+        throwArgumentNullException(ExceptionArgument.ResultSelector)
     }
 
     if (isEmptyArray(source)) {
@@ -158,12 +158,13 @@ class SelectManySingleSelectorIterator<TSource, TResult>(
                 }
 
                 2 -> {
-                    assert(sourceEnumerator != null)
-                    if (!sourceEnumerator!!.moveNext()) {
+                    val sourceEnumerator = sourceEnumerator
+                    sourceEnumerator.assertNotNull()
+                    if (!sourceEnumerator.moveNext()) {
                         break@loop
                     }
 
-                    val element = sourceEnumerator!!.current
+                    val element = sourceEnumerator.current
 
                     subEnumerator = Enumerable.of(selector(element)).enumerator()
                     state = 3
@@ -171,15 +172,16 @@ class SelectManySingleSelectorIterator<TSource, TResult>(
                 }
 
                 3 -> {
-                    assert(subEnumerator != null)
-                    if (!subEnumerator!!.moveNext()) {
-                        subEnumerator!!.close()
-                        subEnumerator = null
+                    val subEnumerator = subEnumerator
+                    subEnumerator.assertNotNull()
+                    if (!subEnumerator.moveNext()) {
+                        subEnumerator.close()
+                        this.subEnumerator = null
                         state = 2
                         continue@loop
                     }
 
-                    currentField = subEnumerator!!.current
+                    current = subEnumerator.current
                     return true
                 }
             }

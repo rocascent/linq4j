@@ -21,7 +21,7 @@ class ArraySkipTakeIterator<TSource>(
     override fun moveNext(): Boolean {
         val index = state - 1
         if (index <= maxIndexInclusive - minIndexInclusive && index < source.size - minIndexInclusive) {
-            currentField = source[minIndexInclusive + index]
+            current = source[minIndexInclusive + index]
             ++state
             return true
         }
@@ -131,9 +131,10 @@ class EnumerableSkipTakeIterator<TSource>(
                 }
 
                 2 -> {
-                    assert(enumerator != null)
+                    val enumerator = enumerator
+                    enumerator.assertNotNull()
 
-                    if (!skipBeforeFirst(enumerator!!)) {
+                    if (!skipBeforeFirst(enumerator)) {
                         break@loop
                     }
 
@@ -142,12 +143,13 @@ class EnumerableSkipTakeIterator<TSource>(
                 }
 
                 else -> {
-                    assert(enumerator != null)
-                    if ((!hasLimit || taken < limit) && enumerator!!.moveNext()) {
+                    val enumerator = enumerator
+                    enumerator.assertNotNull()
+                    if ((!hasLimit || taken < limit) && enumerator.moveNext()) {
                         if (hasLimit) {
                             state++
                         }
-                        currentField = enumerator!!.current
+                        current = enumerator.current
                         return true
                     }
 

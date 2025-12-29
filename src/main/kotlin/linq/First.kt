@@ -6,26 +6,26 @@ import linq.exception.throwArgumentNullException
 import linq.exception.throwNoElementsException
 
 fun <TSource> first(source: Enumerable<TSource>): TSource {
-    return tryGetFirst(source) ?: throwNoElementsException()
+    return source.tryGetFirst() ?: throwNoElementsException()
 }
 
 fun <TSource> first(source: Enumerable<TSource>, predicate: (TSource) -> Boolean): TSource {
-    return tryGetFirst(source, predicate) ?: throwNoElementsException()
+    return source.tryGetFirst(predicate) ?: throwNoElementsException()
 }
 
 fun <TSource> firstOrDefault(source: Enumerable<TSource>): TSource? {
-    return tryGetFirst(source)
+    return source.tryGetFirst()
 }
 
 fun <TSource> firstOrDefault(source: Enumerable<TSource>, defaultValue: TSource): TSource {
-    return tryGetFirst(source) ?: defaultValue
+    return source.tryGetFirst() ?: defaultValue
 }
 
 fun <TSource> firstOrDefault(
     source: Enumerable<TSource>,
     predicate: (TSource) -> Boolean
 ): TSource? {
-    return tryGetFirst(source, predicate)
+    return source.tryGetFirst(predicate)
 }
 
 fun <TSource> firstOrDefault(
@@ -33,17 +33,17 @@ fun <TSource> firstOrDefault(
     predicate: (TSource) -> Boolean,
     defaultValue: TSource
 ): TSource {
-    return tryGetFirst(source, predicate) ?: defaultValue
+    return source.tryGetFirst(predicate) ?: defaultValue
 }
 
-private fun <TSource> tryGetFirst(source: Enumerable<TSource>?): TSource? {
-    if (source == null) {
+internal fun <TSource> Enumerable<TSource>?.tryGetFirst(): TSource? {
+    if (this == null) {
         throwArgumentNullException(ExceptionArgument.Source)
     }
-    if (source is AbstractIterator<TSource>) {
-        return source.tryGetFirst()
+    if (this is AbstractIterator<TSource>) {
+        return this.tryGetFirst()
     }
-    return tryGetFirstNonIterator(source)
+    return tryGetFirstNonIterator(this)
 }
 
 fun <TSource> tryGetFirstNonIterator(source: Enumerable<TSource>): TSource? {
@@ -61,8 +61,8 @@ fun <TSource> tryGetFirstNonIterator(source: Enumerable<TSource>): TSource? {
     return null
 }
 
-fun <TSource> tryGetFirst(source: Enumerable<TSource>?, predicate: ((TSource) -> Boolean)?): TSource? {
-    if (source == null) {
+internal fun <TSource> Enumerable<TSource>?.tryGetFirst(predicate: ((TSource) -> Boolean)?): TSource? {
+    if (this == null) {
         throwArgumentNullException(ExceptionArgument.Source)
     }
 
@@ -70,7 +70,7 @@ fun <TSource> tryGetFirst(source: Enumerable<TSource>?, predicate: ((TSource) ->
         throwArgumentNullException(ExceptionArgument.Predicate)
     }
 
-    for (element in source) {
+    for (element in this) {
         if (predicate(element)) {
             return element
         }

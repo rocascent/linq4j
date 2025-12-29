@@ -41,7 +41,7 @@ abstract class Enumerable<TSource> : Iterable<TSource> {
      * @throws [NullPointerException] source or [func] is null.
      * @throws [IllegalStateException] source contains no elements.
      */
-    fun aggregate(func: ((TSource, TSource) -> TSource)): TSource = aggregate(this, func)
+    fun aggregate(func: (TSource, TSource) -> TSource): TSource = aggregate(this, func)
 
     /**
      * Applies an accumulator function over a sequence. The specified seed value is used as the initial accumulator value.
@@ -50,7 +50,7 @@ abstract class Enumerable<TSource> : Iterable<TSource> {
      * @return The final accumulator value.
      * @throws [NullPointerException] source or [func] is null.
      */
-    fun <TAccumulate> aggregate(seed: TAccumulate, func: ((TAccumulate, TSource) -> TAccumulate)): TAccumulate =
+    fun <TAccumulate> aggregate(seed: TAccumulate, func: (TAccumulate, TSource) -> TAccumulate): TAccumulate =
         aggregate(this, seed, func)
 
     /**
@@ -63,7 +63,7 @@ abstract class Enumerable<TSource> : Iterable<TSource> {
      */
     fun <TAccumulate, TResult> aggregate(
         seed: TAccumulate,
-        func: ((TAccumulate, TSource) -> TAccumulate),
+        func: (TAccumulate, TSource) -> TAccumulate,
         resultSelector: (TAccumulate) -> TResult
     ): TResult = aggregate(this, seed, func, resultSelector)
 
@@ -98,20 +98,163 @@ abstract class Enumerable<TSource> : Iterable<TSource> {
         keyComparer: EqualityComparer<TKey>? = null
     ): Enumerable<Map.Entry<TKey, TAccumulate>> = aggregateBy(this, keySelector, seedSelector, func, keyComparer)
 
+    /**
+     * Determines whether a sequence contains any elements.
+     * @return true if the source sequence contains any elements; otherwise, false.
+     * @throws NullPointerException source is null.
+     */
     fun any(): Boolean = any(this)
 
-    fun any(predicate: ((TSource) -> Boolean)): Boolean = any(this, predicate)
+    /**
+     * Determines whether any element of a sequence satisfies a condition.
+     * @param [predicate] A function to test each element for a condition.
+     * @return true if the source sequence is not empty and at least one of its elements passes the test in the specified predicate; otherwise, false.
+     * @throws NullPointerException source or [predicate] is null.
+     */
+    fun any(predicate: (TSource) -> Boolean): Boolean = any(this, predicate)
 
-    fun all(predicate: ((TSource) -> Boolean)): Boolean = all(this, predicate)
+    /**
+     * Determines whether all elements of a sequence satisfy a condition.
+     * @param [predicate] A function to test each element for a condition.
+     * @return true if every element of the source sequence passes the test in the specified predicate, or if the sequence is empty; otherwise, false.
+     * @throws NullPointerException source or [predicate] is null.
+     */
+    fun all(predicate: (TSource) -> Boolean): Boolean = all(this, predicate)
 
+    /**
+     * Computes the average of a sequence of [Integer] values that are obtained by invoking a transform function on each element of the input sequence.
+     * @param [selector] A transform function to apply to each element.
+     * @return the average of the sequence of values.
+     * @throws [NullPointerException] source or [selector] is null.
+     * @throws [IllegalStateException] source contains no elements.
+     */
+    fun averageInt(selector: (TSource) -> Int) = average(this, selector)
+
+    /**
+     * Computes the average of a sequence of [Long] values that are obtained by invoking a transform function on each element of the input sequence.
+     * @param [selector] A transform function to apply to each element.
+     * @return the average of the sequence of values.
+     * @throws [NullPointerException] source or [selector] is null.
+     * @throws [IllegalStateException] source contains no elements.
+     */
+    fun averageLong(selector: (TSource) -> Long) = average(this, selector)
+
+    /**
+     * Computes the average of a sequence of [Float] values that are obtained by invoking a transform function on each element of the input sequence.
+     * @param [selector] A transform function to apply to each element.
+     * @return the average of the sequence of values.
+     * @throws [NullPointerException] source or [selector] is null.
+     * @throws [IllegalStateException] source contains no elements.
+     */
+    fun averageFloat(selector: (TSource) -> Float) = average(this, selector)
+
+    /**
+     * Computes the average of a sequence of [Double] values that are obtained by invoking a transform function on each element of the input sequence.
+     * @param [selector] A transform function to apply to each element.
+     * @return the average of the sequence of values.
+     * @throws [NullPointerException] source or [selector] is null.
+     * @throws [IllegalStateException] source contains no elements.
+     */
+    fun averageDouble(selector: (TSource) -> Double) = average(this, selector)
+
+    /**
+     * Computes the average of a sequence of [BigDecimal] values that are obtained by invoking a transform function on each element of the input sequence.
+     * @param [selector] A transform function to apply to each element.
+     * @return the average of the sequence of values.
+     * @throws [NullPointerException] source or [selector] is null.
+     * @throws [IllegalStateException] source contains no elements.
+     */
+    fun averageBigDecimal(selector: (TSource) -> BigDecimal) = average(this, selector)
+
+    /**
+     * Casts the elements of an [Enumerable] to the specified type.
+     * @param [clazz] the type class.
+     * @return An [Enumerable] that contains each element of the source sequence cast to the specified type.
+     * @throws [NullPointerException] source is null.
+     * @throws [ClassCastException] An element in the sequence cannot be cast to type TResult.
+     */
+    fun <TResult> cast(clazz: Class<TResult>) = cast(this, clazz)
+
+    /**
+     * Splits the elements of a sequence into chunks of size at most size.
+     * @param [size] The maximum size of each chunk.
+     * @return An [Enumerable] that contains the elements the input sequence split into chunks of size [size].
+     * @throws [NullPointerException] source is null.
+     * @throws [IllegalArgumentException] [size] is below 1.
+     */
+    fun chunk(size: Int) = chunk(this, size)
+
+    /**
+     * Concatenates two sequences.
+     * @param [other] The sequence to concatenate to the source.
+     * @return An [Enumerable] that contains the concatenated elements of the two input sequences.
+     * @throws [NullPointerException] source or [other] is null.
+     */
+    fun concat(other: Iterable<TSource>) = concat(this, other)
+
+    /**
+     * Determines whether a sequence contains a specified element by using the default equality comparer.
+     * @param [value] The value to locate in the sequence.
+     * @return true if the source sequence contains an element that has the specified value; otherwise, false.
+     * @throws [NullPointerException] source is null.
+     */
+    fun contains(value: TSource): Boolean = contains(this, value)
+
+    /**
+     * Determines whether a sequence contains a specified element by using a specified [EqualityComparer].
+     * @param [value] The value to locate in the sequence.
+     * @param [comparer] An equality comparer to compare values.
+     * @return true if the source sequence contains an element that has the specified value; otherwise, false.
+     * @throws [NullPointerException] source is null.
+     */
+    fun contains(value: TSource, comparer: EqualityComparer<TSource>): Boolean = contains(this, value, comparer)
+
+    /**
+     * Returns the number of elements in a sequence.
+     * @return The number of elements in the input sequence.
+     * @throws [NullPointerException] source is null.
+     */
     fun count(): Int = count(this)
 
+    /**
+     * Returns a number that represents how many elements in the specified sequence satisfy a condition.
+     * @param [predicate] A function to test each element for a condition.
+     * @return A number that represents how many elements in the sequence satisfy the condition in the predicate function.
+     * @throws [NullPointerException] source or predicate is null.
+     */
     fun count(predicate: (TSource) -> Boolean): Int = count(this, predicate)
 
+    /**
+     * Returns a [Long] that represents the total number of elements in a sequence.
+     * @return The number of elements in the input sequence.
+     * @throws [NullPointerException] source is null.
+     */
     fun longCount(): Long = longCount(this)
 
+    /**
+     * Returns a [Long] that represents how many elements in a sequence satisfy a condition.
+     * @param [predicate] A function to test each element for a condition.
+     * @return A number that represents how many elements in the sequence satisfy the condition in the predicate function.
+     * @throws [NullPointerException] source or predicate is null.
+     */
     fun longCount(predicate: (TSource) -> Boolean): Long = longCount(this, predicate)
 
+    /**
+     * Returns the element at a specified index in a sequence.
+     * @param [index] The zero-based index of the element to retrieve.
+     * @return The element at the specified position in the source sequence.
+     * @throws [NullPointerException] source is null.
+     * @throws [IllegalArgumentException] index is less than 0 or greater than or equal to the number of elements in source.
+     */
+    fun elementAt(index: Int): TSource = elementAt(this, index)
+
+    /**
+     * Returns the element at a specified index in a sequence or null if the index is out of range.
+     * @param [index] The zero-based index of the element to retrieve.
+     * @return null if the index is outside the bounds of the source sequence; otherwise, the element at the specified position in the source sequence.
+     * @throws [NullPointerException] source is null.
+     */
+    fun elementAtOrDefault(index: Int): TSource? = elementAtOrDefault(this, index)
 
     /**
      * Returns the first element of a sequence.

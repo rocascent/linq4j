@@ -145,9 +145,7 @@ internal class EnumerableSelectIterator<TSource, TResult>(
 ) : AbstractIterator<TResult>() {
     private var enumerator: Enumerator<TSource>? = null
 
-    override fun clone(): AbstractIterator<TResult> {
-        return EnumerableSelectIterator(source, selector)
-    }
+    override fun clone(): AbstractIterator<TResult> = EnumerableSelectIterator(source, selector)
 
     override fun close() {
         enumerator?.close()
@@ -165,8 +163,7 @@ internal class EnumerableSelectIterator<TSource, TResult>(
                 }
 
                 2 -> {
-                    val enumerator = enumerator
-                    enumerator.assertNotNull()
+                    val enumerator = enumerator.assertNotNull()
                     if (enumerator.moveNext()) {
                         current = selector(enumerator.current)
                         return true
@@ -252,9 +249,8 @@ class ArraySkipTakeSelectIterator<TSource, TResult>(
         assert(minIndexInclusive <= maxIndexInclusive)
     }
 
-    override fun clone(): AbstractIterator<TResult> {
-        return ArraySkipTakeSelectIterator(source, selector, minIndexInclusive, maxIndexInclusive)
-    }
+    override fun clone(): AbstractIterator<TResult> =
+        ArraySkipTakeSelectIterator(source, selector, minIndexInclusive, maxIndexInclusive)
 
     override fun moveNext(): Boolean {
         val index = state - 1

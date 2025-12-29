@@ -131,8 +131,7 @@ class EnumerableSkipTakeIterator<TSource>(
                 }
 
                 2 -> {
-                    val enumerator = enumerator
-                    enumerator.assertNotNull()
+                    val enumerator = enumerator.assertNotNull()
 
                     if (!skipBeforeFirst(enumerator)) {
                         break@loop
@@ -143,8 +142,7 @@ class EnumerableSkipTakeIterator<TSource>(
                 }
 
                 else -> {
-                    val enumerator = enumerator
-                    enumerator.assertNotNull()
+                    val enumerator = enumerator.assertNotNull()
                     if ((!hasLimit || taken < limit) && enumerator.moveNext()) {
                         if (hasLimit) {
                             state++

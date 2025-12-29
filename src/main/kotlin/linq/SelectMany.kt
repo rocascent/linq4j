@@ -136,9 +136,7 @@ class SelectManySingleSelectorIterator<TSource, TResult>(
     private var sourceEnumerator: Enumerator<TSource>? = null
     private var subEnumerator: Enumerator<TResult>? = null
 
-    override fun clone(): AbstractIterator<TResult> {
-        return SelectManySingleSelectorIterator(source, selector)
-    }
+    override fun clone(): AbstractIterator<TResult> = SelectManySingleSelectorIterator(source, selector)
 
     override fun close() {
         subEnumerator?.close()
@@ -158,8 +156,7 @@ class SelectManySingleSelectorIterator<TSource, TResult>(
                 }
 
                 2 -> {
-                    val sourceEnumerator = sourceEnumerator
-                    sourceEnumerator.assertNotNull()
+                    val sourceEnumerator = sourceEnumerator.assertNotNull()
                     if (!sourceEnumerator.moveNext()) {
                         break@loop
                     }
@@ -172,8 +169,7 @@ class SelectManySingleSelectorIterator<TSource, TResult>(
                 }
 
                 3 -> {
-                    val subEnumerator = subEnumerator
-                    subEnumerator.assertNotNull()
+                    val subEnumerator = subEnumerator.assertNotNull()
                     if (!subEnumerator.moveNext()) {
                         subEnumerator.close()
                         this.subEnumerator = null

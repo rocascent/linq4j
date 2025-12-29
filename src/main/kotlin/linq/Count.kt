@@ -75,3 +75,11 @@ fun <TSource> longCount(source: Enumerable<TSource>?, predicate: ((TSource) -> B
     }
     return count
 }
+
+fun <TSource> Enumerable<TSource>.tryGetNonEnumeratedCount(): Int? {
+    if (this is ArrayEnumerable<TSource>) {
+        return this.size
+    }
+
+    return null
+}

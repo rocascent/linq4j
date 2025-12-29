@@ -67,9 +67,7 @@ class ArrayWhereIterator<TSource>(
         assert(source.size > 0)
     }
 
-    override fun clone(): AbstractIterator<TSource> {
-        return ArrayWhereIterator(source, predicate)
-    }
+    override fun clone(): AbstractIterator<TSource> = ArrayWhereIterator(source, predicate)
 
     override fun moveNext(): Boolean {
         var index = state - 1
@@ -123,9 +121,7 @@ class EnumerableWhereIterator<TSource>(
 ) : AbstractIterator<TSource>() {
     private var enumerator: Enumerator<TSource>? = null
 
-    override fun clone(): AbstractIterator<TSource> {
-        return EnumerableWhereIterator(source, predicate)
-    }
+    override fun clone(): AbstractIterator<TSource> = EnumerableWhereIterator(source, predicate)
 
     override fun close() {
         enumerator?.close()
@@ -143,8 +139,7 @@ class EnumerableWhereIterator<TSource>(
                 }
 
                 2 -> {
-                    val enumerator = enumerator
-                    enumerator.assertNotNull()
+                    val enumerator = enumerator.assertNotNull()
                     while (enumerator.moveNext()) {
                         val item = enumerator.current
                         if (predicate(item)) {
@@ -205,9 +200,7 @@ class ArrayWhereSelectIterator<TSource, TResult>(
         assert(source.count() > 0)
     }
 
-    override fun clone(): AbstractIterator<TResult> {
-        return ArrayWhereSelectIterator(source, predicate, selector)
-    }
+    override fun clone(): AbstractIterator<TResult> = ArrayWhereSelectIterator(source, predicate, selector)
 
     override fun moveNext(): Boolean {
         var index = state - 1
@@ -260,9 +253,7 @@ class EnumerableWhereSelectIterator<TSource, TResult>(
 ) : AbstractIterator<TResult>() {
     private var enumerator: Enumerator<TSource>? = null
 
-    override fun clone(): AbstractIterator<TResult> {
-        return EnumerableWhereSelectIterator(source, predicate, selector)
-    }
+    override fun clone(): AbstractIterator<TResult> = EnumerableWhereSelectIterator(source, predicate, selector)
 
     override fun close() {
         enumerator?.close()
@@ -280,8 +271,7 @@ class EnumerableWhereSelectIterator<TSource, TResult>(
                 }
 
                 2 -> {
-                    val enumerator = enumerator
-                    enumerator.assertNotNull()
+                    val enumerator = enumerator.assertNotNull()
                     while (enumerator.moveNext()) {
                         val item = enumerator.current
                         if (predicate(item)) {

@@ -7,7 +7,7 @@ abstract class AbstractIterator<TSource> : Enumerable<TSource>(), Enumerator<TSo
 
     override var current: TSource
         get() = backingCurrent ?: throw IllegalStateException()
-        set(value) {
+        protected set(value) {
             backingCurrent = value
         }
 

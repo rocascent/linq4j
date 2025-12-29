@@ -128,7 +128,7 @@ abstract class Enumerable<TSource> : Iterable<TSource> {
      * @throws [NullPointerException] source or [selector] is null.
      * @throws [IllegalStateException] source contains no elements.
      */
-    fun averageInt(selector: (TSource) -> Int) = average(this, selector)
+    fun averageInt(selector: (TSource) -> Int) = averageInt(this, selector)
 
     /**
      * Computes the average of a sequence of [Long] values that are obtained by invoking a transform function on each element of the input sequence.
@@ -137,7 +137,7 @@ abstract class Enumerable<TSource> : Iterable<TSource> {
      * @throws [NullPointerException] source or [selector] is null.
      * @throws [IllegalStateException] source contains no elements.
      */
-    fun averageLong(selector: (TSource) -> Long) = average(this, selector)
+    fun averageLong(selector: (TSource) -> Long) = averageLong(this, selector)
 
     /**
      * Computes the average of a sequence of [Float] values that are obtained by invoking a transform function on each element of the input sequence.
@@ -146,7 +146,7 @@ abstract class Enumerable<TSource> : Iterable<TSource> {
      * @throws [NullPointerException] source or [selector] is null.
      * @throws [IllegalStateException] source contains no elements.
      */
-    fun averageFloat(selector: (TSource) -> Float) = average(this, selector)
+    fun averageFloat(selector: (TSource) -> Float) = averageFloat(this, selector)
 
     /**
      * Computes the average of a sequence of [Double] values that are obtained by invoking a transform function on each element of the input sequence.
@@ -155,7 +155,7 @@ abstract class Enumerable<TSource> : Iterable<TSource> {
      * @throws [NullPointerException] source or [selector] is null.
      * @throws [IllegalStateException] source contains no elements.
      */
-    fun averageDouble(selector: (TSource) -> Double) = average(this, selector)
+    fun averageDouble(selector: (TSource) -> Double) = averageDouble(this, selector)
 
     /**
      * Computes the average of a sequence of [BigDecimal] values that are obtained by invoking a transform function on each element of the input sequence.
@@ -164,7 +164,7 @@ abstract class Enumerable<TSource> : Iterable<TSource> {
      * @throws [NullPointerException] source or [selector] is null.
      * @throws [IllegalStateException] source contains no elements.
      */
-    fun averageBigDecimal(selector: (TSource) -> BigDecimal) = average(this, selector)
+    fun averageBigDecimal(selector: (TSource) -> BigDecimal) = averageBigDecimal(this, selector)
 
     /**
      * Casts the elements of an [Enumerable] to the specified type.
@@ -350,15 +350,15 @@ abstract class Enumerable<TSource> : Iterable<TSource> {
 
     fun skipWhile(predicate: (TSource, Int) -> Boolean): Enumerable<TSource> = skipWhile(this, predicate)
 
-    fun sumInt(selector: (TSource) -> Int): Int = sum(this, selector)
+    fun sumInt(selector: (TSource) -> Int): Int = sumInt(this, selector)
 
-    fun sumLong(selector: (TSource) -> Long): Long = sum(this, selector)
+    fun sumLong(selector: (TSource) -> Long): Long = sumLong(this, selector)
 
-    fun sumFloat(selector: (TSource) -> Float): Float = sum(this, selector)
+    fun sumFloat(selector: (TSource) -> Float): Float = sumFloat(this, selector)
 
-    fun sumDouble(selector: (TSource) -> Double): Double = sum(this, selector)
+    fun sumDouble(selector: (TSource) -> Double): Double = sumDouble(this, selector)
 
-    fun sumBigDecimal(selector: (TSource) -> BigDecimal): BigDecimal = sum(this, selector)
+    fun sumBigDecimal(selector: (TSource) -> BigDecimal): BigDecimal = sumBigDecimal(this, selector)
 
 
     fun take(count: Int): Enumerable<TSource> = take(this, count)

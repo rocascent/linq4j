@@ -5,7 +5,7 @@ import linq.exception.throwArgumentNullException
 import linq.exception.throwNoElementsException
 import java.math.BigDecimal
 
-fun <TSource> average(source: Enumerable<TSource>?, selector: ((TSource) -> Int)?): Double {
+fun <TSource> averageInt(source: Enumerable<TSource>?, selector: ((TSource) -> Int)?): Double {
     if (source == null) {
         throwArgumentNullException(ExceptionArgument.Source)
     }
@@ -32,7 +32,7 @@ fun <TSource> average(source: Enumerable<TSource>?, selector: ((TSource) -> Int)
     }
 }
 
-fun <TSource> average(source: Enumerable<TSource>?, selector: ((TSource) -> Long)?): Double {
+fun <TSource> averageLong(source: Enumerable<TSource>?, selector: ((TSource) -> Long)?): Double {
     if (source == null) {
         throwArgumentNullException(ExceptionArgument.Source)
     }
@@ -59,7 +59,7 @@ fun <TSource> average(source: Enumerable<TSource>?, selector: ((TSource) -> Long
     }
 }
 
-fun <TSource> average(source: Enumerable<TSource>?, selector: ((TSource) -> Float)?): Float {
+fun <TSource> averageFloat(source: Enumerable<TSource>?, selector: ((TSource) -> Float)?): Float {
     if (source == null) {
         throwArgumentNullException(ExceptionArgument.Source)
     }
@@ -86,7 +86,7 @@ fun <TSource> average(source: Enumerable<TSource>?, selector: ((TSource) -> Floa
     }
 }
 
-fun <TSource> average(source: Enumerable<TSource>?, selector: ((TSource) -> Double)?): Double {
+fun <TSource> averageDouble(source: Enumerable<TSource>?, selector: ((TSource) -> Double)?): Double {
     if (source == null) {
         throwArgumentNullException(ExceptionArgument.Source)
     }
@@ -113,7 +113,7 @@ fun <TSource> average(source: Enumerable<TSource>?, selector: ((TSource) -> Doub
     }
 }
 
-fun <TSource> average(source: Enumerable<TSource>?, selector: ((TSource) -> BigDecimal)?): BigDecimal {
+fun <TSource> averageBigDecimal(source: Enumerable<TSource>?, selector: ((TSource) -> BigDecimal)?): BigDecimal {
     if (source == null) {
         throwArgumentNullException(ExceptionArgument.Source)
     }

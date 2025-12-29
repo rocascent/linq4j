@@ -4,7 +4,7 @@ import linq.exception.ExceptionArgument
 import linq.exception.throwArgumentNullException
 import java.math.BigDecimal
 
-fun <TSource> sum(source: Enumerable<TSource>?, selector: ((TSource) -> Int)?): Int {
+fun <TSource> sumInt(source: Enumerable<TSource>?, selector: ((TSource) -> Int)?): Int {
     if (source == null) {
         throwArgumentNullException(ExceptionArgument.Source)
     }
@@ -21,7 +21,7 @@ fun <TSource> sum(source: Enumerable<TSource>?, selector: ((TSource) -> Int)?): 
     return sum
 }
 
-fun <TSource> sum(source: Enumerable<TSource>?, selector: ((TSource) -> Long)?): Long {
+fun <TSource> sumLong(source: Enumerable<TSource>?, selector: ((TSource) -> Long)?): Long {
     if (source == null) {
         throwArgumentNullException(ExceptionArgument.Source)
     }
@@ -38,7 +38,7 @@ fun <TSource> sum(source: Enumerable<TSource>?, selector: ((TSource) -> Long)?):
     return sum
 }
 
-fun <TSource> sum(source: Enumerable<TSource>?, selector: ((TSource) -> Float)?): Float {
+fun <TSource> sumFloat(source: Enumerable<TSource>?, selector: ((TSource) -> Float)?): Float {
     if (source == null) {
         throwArgumentNullException(ExceptionArgument.Source)
     }
@@ -55,7 +55,7 @@ fun <TSource> sum(source: Enumerable<TSource>?, selector: ((TSource) -> Float)?)
     return sum
 }
 
-fun <TSource> sum(source: Enumerable<TSource>?, selector: ((TSource) -> Double)?): Double {
+fun <TSource> sumDouble(source: Enumerable<TSource>?, selector: ((TSource) -> Double)?): Double {
     if (source == null) {
         throwArgumentNullException(ExceptionArgument.Source)
     }
@@ -72,7 +72,7 @@ fun <TSource> sum(source: Enumerable<TSource>?, selector: ((TSource) -> Double)?
     return sum
 }
 
-fun <TSource> sum(source: Enumerable<TSource>?, selector: ((TSource) -> BigDecimal)?): BigDecimal {
+fun <TSource> sumBigDecimal(source: Enumerable<TSource>?, selector: ((TSource) -> BigDecimal)?): BigDecimal {
     if (source == null) {
         throwArgumentNullException(ExceptionArgument.Source)
     }

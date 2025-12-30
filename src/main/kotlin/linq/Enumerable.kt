@@ -1,38 +1,9 @@
 package linq
 
-import linq.collections.IteratorAdapter
-import linq.collections.enumerable.ArrayEnumerable
-import linq.collections.enumerable.EmptyEnumerable
-import linq.collections.enumerable.IterableEnumerable
 import java.math.BigDecimal
 
-fun <TSource> isEmptyArray(source: Iterable<TSource>): Boolean {
-    return source is ArrayEnumerable && source.size == 0
-}
-
-abstract class Enumerable<TSource> : Iterable<TSource> {
-    companion object {
-        @JvmStatic
-        fun <TSource> of(): Enumerable<TSource> {
-            return EmptyEnumerable()
-        }
-
-        @JvmStatic
-        fun <TSource> of(vararg source: TSource): Enumerable<TSource> {
-            return ArrayEnumerable(source)
-        }
-
-        @JvmStatic
-        fun <TSource> of(source: Iterable<TSource>): Enumerable<TSource> {
-            return IterableEnumerable(source)
-        }
-    }
-
-    abstract fun enumerator(): Enumerator<TSource>
-
-    override fun iterator(): Iterator<TSource> {
-        return IteratorAdapter(enumerator())
-    }
+open class Enumerable<TSource> internal constructor(private val source: Sequence<TSource>) : Iterable<TSource> {
+    override fun iterator(): Iterator<TSource> = source.iterator()
 
     /**
      * Applies an accumulator function over a sequence.
@@ -41,7 +12,7 @@ abstract class Enumerable<TSource> : Iterable<TSource> {
      * @throws [NullPointerException] source or [func] is null.
      * @throws [IllegalStateException] source contains no elements.
      */
-    fun aggregate(func: (TSource, TSource) -> TSource): TSource = aggregate(this, func)
+    fun aggregate(func: (TSource, TSource) -> TSource): TSource = source.reduce(func)
 
     /**
      * Applies an accumulator function over a sequence. The specified seed value is used as the initial accumulator value.
@@ -51,7 +22,7 @@ abstract class Enumerable<TSource> : Iterable<TSource> {
      * @throws [NullPointerException] source or [func] is null.
      */
     fun <TAccumulate> aggregate(seed: TAccumulate, func: (TAccumulate, TSource) -> TAccumulate): TAccumulate =
-        aggregate(this, seed, func)
+        source.fold(seed, func)
 
     /**
      * Applies an accumulator function over a sequence. The specified seed value is used as the initial accumulator value, and the specified function is used to select the result value.
@@ -65,45 +36,51 @@ abstract class Enumerable<TSource> : Iterable<TSource> {
         seed: TAccumulate,
         func: (TAccumulate, TSource) -> TAccumulate,
         resultSelector: (TAccumulate) -> TResult
-    ): TResult = aggregate(this, seed, func, resultSelector)
+    ): TResult = resultSelector(source.fold(seed, func))
 
     /**
      * Applies an accumulator function over a sequence, grouping results by key.
      * @param [keySelector] A function to extract the key for each element.
      * @param [seed] The initial accumulator value.
      * @param [func] An accumulator function to be invoked on each element.
-     * @param [keyComparer] An [EqualityComparer] to compare keys with.
      * @return An enumerable containing the aggregates corresponding to each key deriving from source.
      */
     fun <TKey, TAccumulate> aggregateBy(
         keySelector: (TSource) -> TKey,
         seed: TAccumulate,
-        func: (TAccumulate, TSource) -> TAccumulate,
-        keyComparer: EqualityComparer<TKey>? = null
-    ): Enumerable<Map.Entry<TKey, TAccumulate>> = aggregateBy(this, keySelector, seed, func, keyComparer)
+        func: (TAccumulate, TSource) -> TAccumulate
+    ): Enumerable<Map.Entry<TKey, TAccumulate>> = Enumerable(
+        source.groupingBy(keySelector)
+            .fold(seed, func)
+            .asSequence()
+    )
 
 
-    /**
-     * Applies an accumulator function over a sequence, grouping results by key.
-     * @param [keySelector] A function to extract the key for each element.
-     * @param [seedSelector] A factory for the initial accumulator value.
-     * @param [func] An accumulator function to be invoked on each element.
-     * @param [keyComparer] An [EqualityComparer] to compare keys with.
-     * @return An enumerable containing the aggregates corresponding to each key deriving from source.
-     */
-    fun <TKey, TAccumulate> aggregateBy(
-        keySelector: (TSource) -> TKey,
-        seedSelector: (TKey) -> TAccumulate,
-        func: (TAccumulate, TSource) -> TAccumulate,
-        keyComparer: EqualityComparer<TKey>? = null
-    ): Enumerable<Map.Entry<TKey, TAccumulate>> = aggregateBy(this, keySelector, seedSelector, func, keyComparer)
+//    /**
+//     * Applies an accumulator function over a sequence, grouping results by key.
+//     * @param [keySelector] A function to extract the key for each element.
+//     * @param [seedSelector] A factory for the initial accumulator value.
+//     * @param [func] An accumulator function to be invoked on each element.
+//     * @return An enumerable containing the aggregates corresponding to each key deriving from source.
+//     */
+//    fun <TKey, TAccumulate> aggregateBy(
+//        keySelector: (TSource) -> TKey,
+//        seedSelector: (TKey) -> TAccumulate,
+//        func: (TAccumulate, TSource) -> TAccumulate
+//    ): Enumerable<Map.Entry<TKey, TAccumulate>> = Enumerable(
+//        source.groupingBy(keySelector)
+//            .fold(
+//                { k, _ -> seedSelector(k) },
+//                { _, a, e -> func(a, e) }
+//            ).asSequence()
+//    )
 
     /**
      * Determines whether a sequence contains any elements.
      * @return true if the source sequence contains any elements; otherwise, false.
      * @throws NullPointerException source is null.
      */
-    fun any(): Boolean = any(this)
+    fun any(): Boolean = source.any()
 
     /**
      * Determines whether any element of a sequence satisfies a condition.
@@ -111,7 +88,7 @@ abstract class Enumerable<TSource> : Iterable<TSource> {
      * @return true if the source sequence is not empty and at least one of its elements passes the test in the specified predicate; otherwise, false.
      * @throws NullPointerException source or [predicate] is null.
      */
-    fun any(predicate: (TSource) -> Boolean): Boolean = any(this, predicate)
+    fun any(predicate: (TSource) -> Boolean): Boolean = source.any(predicate)
 
     /**
      * Determines whether all elements of a sequence satisfy a condition.
@@ -119,7 +96,7 @@ abstract class Enumerable<TSource> : Iterable<TSource> {
      * @return true if every element of the source sequence passes the test in the specified predicate, or if the sequence is empty; otherwise, false.
      * @throws NullPointerException source or [predicate] is null.
      */
-    fun all(predicate: (TSource) -> Boolean): Boolean = all(this, predicate)
+    fun all(predicate: (TSource) -> Boolean): Boolean = source.all(predicate)
 
     /**
      * Computes the average of a sequence of [Integer] values that are obtained by invoking a transform function on each element of the input sequence.
@@ -128,7 +105,7 @@ abstract class Enumerable<TSource> : Iterable<TSource> {
      * @throws [NullPointerException] source or [selector] is null.
      * @throws [IllegalStateException] source contains no elements.
      */
-    fun averageInt(selector: (TSource) -> Int) = average(this, selector)
+    fun averageInt(selector: (TSource) -> Int): Double = source.map(selector).average()
 
     /**
      * Computes the average of a sequence of [Long] values that are obtained by invoking a transform function on each element of the input sequence.
@@ -137,7 +114,7 @@ abstract class Enumerable<TSource> : Iterable<TSource> {
      * @throws [NullPointerException] source or [selector] is null.
      * @throws [IllegalStateException] source contains no elements.
      */
-    fun averageLong(selector: (TSource) -> Long) = average(this, selector)
+    fun averageLong(selector: (TSource) -> Long): Double = source.map(selector).average()
 
     /**
      * Computes the average of a sequence of [Float] values that are obtained by invoking a transform function on each element of the input sequence.
@@ -146,7 +123,7 @@ abstract class Enumerable<TSource> : Iterable<TSource> {
      * @throws [NullPointerException] source or [selector] is null.
      * @throws [IllegalStateException] source contains no elements.
      */
-    fun averageFloat(selector: (TSource) -> Float) = average(this, selector)
+    fun averageFloat(selector: (TSource) -> Float): Float = source.map(selector).average().toFloat()
 
     /**
      * Computes the average of a sequence of [Double] values that are obtained by invoking a transform function on each element of the input sequence.
@@ -155,7 +132,7 @@ abstract class Enumerable<TSource> : Iterable<TSource> {
      * @throws [NullPointerException] source or [selector] is null.
      * @throws [IllegalStateException] source contains no elements.
      */
-    fun averageDouble(selector: (TSource) -> Double) = average(this, selector)
+    fun averageDouble(selector: (TSource) -> Double): Double = source.map(selector).average()
 
     /**
      * Computes the average of a sequence of [BigDecimal] values that are obtained by invoking a transform function on each element of the input sequence.
@@ -164,7 +141,7 @@ abstract class Enumerable<TSource> : Iterable<TSource> {
      * @throws [NullPointerException] source or [selector] is null.
      * @throws [IllegalStateException] source contains no elements.
      */
-    fun averageBigDecimal(selector: (TSource) -> BigDecimal) = average(this, selector)
+    fun averageBigDecimal(selector: (TSource) -> BigDecimal): BigDecimal = source.map(selector).average()
 
     /**
      * Casts the elements of an [Enumerable] to the specified type.
@@ -173,7 +150,7 @@ abstract class Enumerable<TSource> : Iterable<TSource> {
      * @throws [NullPointerException] source is null.
      * @throws [ClassCastException] An element in the sequence cannot be cast to type TResult.
      */
-    fun <TResult> cast(clazz: Class<TResult>) = cast(this, clazz)
+    fun <TResult> cast(clazz: Class<TResult>): Enumerable<TResult> = Enumerable(source.cast(clazz))
 
     /**
      * Splits the elements of a sequence into chunks of size at most size.
@@ -182,7 +159,7 @@ abstract class Enumerable<TSource> : Iterable<TSource> {
      * @throws [NullPointerException] source is null.
      * @throws [IllegalArgumentException] [size] is below 1.
      */
-    fun chunk(size: Int) = chunk(this, size)
+    fun chunk(size: Int): Enumerable<List<TSource>> = Enumerable(source.chunked(size))
 
     /**
      * Concatenates two sequences.
@@ -190,7 +167,7 @@ abstract class Enumerable<TSource> : Iterable<TSource> {
      * @return An [Enumerable] that contains the concatenated elements of the two input sequences.
      * @throws [NullPointerException] source or [other] is null.
      */
-    fun concat(other: Iterable<TSource>) = concat(this, other)
+    fun concat(other: Iterable<TSource>): Enumerable<TSource> = Enumerable(source + other)
 
     /**
      * Determines whether a sequence contains a specified element by using the default equality comparer.
@@ -198,23 +175,24 @@ abstract class Enumerable<TSource> : Iterable<TSource> {
      * @return true if the source sequence contains an element that has the specified value; otherwise, false.
      * @throws [NullPointerException] source is null.
      */
-    fun contains(value: TSource): Boolean = contains(this, value)
+    fun contains(value: TSource): Boolean = source.contains(value)
 
     /**
-     * Determines whether a sequence contains a specified element by using a specified [EqualityComparer].
+     * Determines whether a sequence contains a specified element by using a specified EqualityComparer.
      * @param [value] The value to locate in the sequence.
      * @param [comparer] An equality comparer to compare values.
      * @return true if the source sequence contains an element that has the specified value; otherwise, false.
      * @throws [NullPointerException] source is null.
      */
-    fun contains(value: TSource, comparer: EqualityComparer<TSource>): Boolean = contains(this, value, comparer)
+    fun contains(value: TSource, comparer: (TSource, TSource) -> Boolean): Boolean =
+        source.any { comparer(value, it) }
 
     /**
      * Returns the number of elements in a sequence.
      * @return The number of elements in the input sequence.
      * @throws [NullPointerException] source is null.
      */
-    fun count(): Int = count(this)
+    fun count(): Int = source.count()
 
     /**
      * Returns a number that represents how many elements in the specified sequence satisfy a condition.
@@ -222,14 +200,14 @@ abstract class Enumerable<TSource> : Iterable<TSource> {
      * @return A number that represents how many elements in the sequence satisfy the condition in the predicate function.
      * @throws [NullPointerException] source or predicate is null.
      */
-    fun count(predicate: (TSource) -> Boolean): Int = count(this, predicate)
+    fun count(predicate: (TSource) -> Boolean): Int = source.count(predicate)
 
     /**
      * Returns a [Long] that represents the total number of elements in a sequence.
      * @return The number of elements in the input sequence.
      * @throws [NullPointerException] source is null.
      */
-    fun longCount(): Long = longCount(this)
+    fun longCount(): Long = source.longCount()
 
     /**
      * Returns a [Long] that represents how many elements in a sequence satisfy a condition.
@@ -237,16 +215,24 @@ abstract class Enumerable<TSource> : Iterable<TSource> {
      * @return A number that represents how many elements in the sequence satisfy the condition in the predicate function.
      * @throws [NullPointerException] source or predicate is null.
      */
-    fun longCount(predicate: (TSource) -> Boolean): Long = longCount(this, predicate)
+    fun longCount(predicate: (TSource) -> Boolean): Long = source.longCount(predicate)
+
+    fun <TKey> countBy(keySelector: (TSource) -> TKey): Enumerable<Map.Entry<TKey, Int>> = Enumerable(
+        source.groupingBy(keySelector)
+            .eachCount()
+            .asSequence()
+    )
+
+    fun distinct(): Enumerable<TSource> = Enumerable(source.distinct())
 
     /**
      * Returns the element at a specified index in a sequence.
      * @param [index] The zero-based index of the element to retrieve.
      * @return The element at the specified position in the source sequence.
      * @throws [NullPointerException] source is null.
-     * @throws [IllegalArgumentException] index is less than 0 or greater than or equal to the number of elements in source.
+     * @throws [IndexOutOfBoundsException] index is less than 0 or greater than or equal to the number of elements in source.
      */
-    fun elementAt(index: Int): TSource = elementAt(this, index)
+    fun elementAt(index: Int): TSource = source.elementAt(index)
 
     /**
      * Returns the element at a specified index in a sequence or null if the index is out of range.
@@ -254,7 +240,7 @@ abstract class Enumerable<TSource> : Iterable<TSource> {
      * @return null if the index is outside the bounds of the source sequence; otherwise, the element at the specified position in the source sequence.
      * @throws [NullPointerException] source is null.
      */
-    fun elementAtOrDefault(index: Int): TSource? = elementAtOrDefault(this, index)
+    fun elementAtOrDefault(index: Int): TSource? = source.elementAtOrNull(index)
 
     /**
      * Returns the first element of a sequence.
@@ -262,7 +248,7 @@ abstract class Enumerable<TSource> : Iterable<TSource> {
      * @throws [NullPointerException]  source is null.
      * @throws [IllegalStateException] The source sequence is empty.
      */
-    fun first(): TSource = first(this)
+    fun first(): TSource = source.first()
 
     /**
      * Returns the first element of a sequence.
@@ -272,7 +258,7 @@ abstract class Enumerable<TSource> : Iterable<TSource> {
      * @throws [NullPointerException]  source or predicate is null.
      * @throws [IllegalStateException] No element satisfies the condition in predicate. -or- The source sequence is empty.
      */
-    fun first(predicate: (TSource) -> Boolean): TSource = first(this, predicate)
+    fun first(predicate: (TSource) -> Boolean): TSource = source.first(predicate)
 
     /**
      * Returns the first element of a sequence, or a default value if the sequence contains no elements.
@@ -280,7 +266,7 @@ abstract class Enumerable<TSource> : Iterable<TSource> {
      * @return null if source is empty otherwise, the first element in source.
      * @throws [NullPointerException] source is null.
      */
-    fun firstOrDefault(): TSource? = firstOrDefault(this)
+    fun firstOrDefault(): TSource? = source.firstOrNull()
 
     /**
      * Returns the first element of a sequence, or a specified default value if the sequence contains no elements.
@@ -289,7 +275,7 @@ abstract class Enumerable<TSource> : Iterable<TSource> {
      * @return [defaultValue] if source is empty otherwise, the first element in source.
      * @throws [NullPointerException] source is null.
      */
-    fun firstOrDefault(defaultValue: TSource): TSource = firstOrDefault(this, defaultValue)
+    fun firstOrDefault(defaultValue: TSource): TSource = source.firstOrNull() ?: defaultValue
 
     /**
      * Returns the first element of the sequence that satisfies a condition or a default value if no such element is found.
@@ -298,7 +284,7 @@ abstract class Enumerable<TSource> : Iterable<TSource> {
      * @return null if source is empty or if no element passes the test specified by predicate otherwise, the first element in source that passes the test specified by predicate.
      * @throws [NullPointerException] source or predicate is null.
      */
-    fun firstOrDefault(predicate: (TSource) -> Boolean): TSource? = firstOrDefault(this, predicate)
+    fun firstOrDefault(predicate: (TSource) -> Boolean): TSource? = source.firstOrNull(predicate)
 
     /**
      * Returns the first element of the sequence that satisfies a condition or a default value if no such element is found.
@@ -309,7 +295,20 @@ abstract class Enumerable<TSource> : Iterable<TSource> {
      * @throws NullPointerException source or predicate is null.
      */
     fun firstOrDefault(predicate: (TSource) -> Boolean, defaultValue: TSource): TSource =
-        firstOrDefault(this, predicate, defaultValue)
+        source.firstOrNull(predicate) ?: defaultValue
+
+    fun <TInner, TKey, TResult> groupJoin(
+        inner: Iterable<TInner>,
+        outerKeySelector: (TSource) -> TKey,
+        innerKeySelector: (TInner) -> TKey,
+        resultSelector: (TSource, Enumerable<TInner>) -> TResult
+    ): Enumerable<TResult> = Enumerable(source.groupJoin(inner, outerKeySelector, innerKeySelector, resultSelector))
+
+    fun <TKey> groupBy(keySelector: (TSource) -> TKey): Enumerable<Group<TKey, TSource>> =
+        Enumerable(source.groupBy(keySelector))
+
+    fun <TKey, TElement> groupBy(keySelector: (TSource) -> TKey, elementSelector: (TSource) -> TElement) =
+        Enumerable(source.groupBy(keySelector, elementSelector))
 
     /**
      * Projects each element of a sequence into a new form.
@@ -317,7 +316,7 @@ abstract class Enumerable<TSource> : Iterable<TSource> {
      * @return An Enumerable<out T> whose elements are the result of invoking the transform function on each element of source.
      * @exception [NullPointerException] source or [selector] is null.
      */
-    fun <TResult> select(selector: (TSource) -> TResult): Enumerable<TResult> = select(this, selector)
+    fun <TResult> select(selector: (TSource) -> TResult): Enumerable<TResult> = Enumerable(source.map(selector))
 
     /**
      * Projects each element of a sequence into a new form by incorporating the element's index.
@@ -325,51 +324,52 @@ abstract class Enumerable<TSource> : Iterable<TSource> {
      * @return An Enumerable<out T> whose elements are the result of invoking the transform function on each element of source.
      * @exception [NullPointerException] source or [selector] is null.
      */
-    fun <TResult> select(selector: (TSource, Int) -> TResult): Enumerable<TResult> = select(this, selector)
+    fun <TResult> select(selector: (TSource, Int) -> TResult): Enumerable<TResult> =
+        Enumerable(source.mapIndexed { index, e -> selector(e, index) })
 
     fun <TResult> selectMany(selector: (TSource) -> Iterable<TResult>): Enumerable<TResult> =
-        selectMany(this, selector)
+        Enumerable(source.selectMany(selector))
 
     fun <TResult> selectMany(selector: (TSource, Int) -> Iterable<TResult>): Enumerable<TResult> =
-        selectMany(this, selector)
+        Enumerable(source.selectMany(selector))
 
     fun <TCollection, TResult> selectMany(
         collectionSelector: (TSource) -> Iterable<TCollection>,
         resultSelector: (TSource, TCollection) -> TResult
-    ): Enumerable<TResult> = selectMany(this, collectionSelector, resultSelector)
+    ): Enumerable<TResult> = Enumerable(source.selectMany(collectionSelector, resultSelector))
 
     fun <TCollection, TResult> selectMany(
         collectionSelector: (TSource, Int) -> Iterable<TCollection>,
         resultSelector: (TSource, TCollection) -> TResult
-    ): Enumerable<TResult> = selectMany(this, collectionSelector, resultSelector)
+    ): Enumerable<TResult> = Enumerable(source.selectMany(collectionSelector, resultSelector))
 
 
-    fun skip(count: Int): Enumerable<TSource> = skip(this, count)
+    fun skip(count: Int): Enumerable<TSource> = Enumerable(source.drop(count))
 
-    fun skipWhile(predicate: (TSource) -> Boolean): Enumerable<TSource> = skipWhile(this, predicate)
+    fun skipWhile(predicate: (TSource) -> Boolean): Enumerable<TSource> = Enumerable(source.dropWhile(predicate))
 
-    fun skipWhile(predicate: (TSource, Int) -> Boolean): Enumerable<TSource> = skipWhile(this, predicate)
+    fun skipWhile(predicate: (TSource, Int) -> Boolean): Enumerable<TSource> = Enumerable(source.skipWhile(predicate))
 
-    fun sumInt(selector: (TSource) -> Int): Int = sum(this, selector)
+    fun skipLast(count: Int): Enumerable<TSource> = Enumerable(source.skipLast(count))
 
-    fun sumLong(selector: (TSource) -> Long): Long = sum(this, selector)
+    fun sumInt(selector: (TSource) -> Int): Int = source.sumOf(selector)
 
-    fun sumFloat(selector: (TSource) -> Float): Float = sum(this, selector)
+    fun sumLong(selector: (TSource) -> Long): Long = source.sumOf(selector)
 
-    fun sumDouble(selector: (TSource) -> Double): Double = sum(this, selector)
+    fun sumFloat(selector: (TSource) -> Float): Float = source.sum(selector)
 
-    fun sumBigDecimal(selector: (TSource) -> BigDecimal): BigDecimal = sum(this, selector)
+    fun sumDouble(selector: (TSource) -> Double): Double = source.sumOf(selector)
 
+    fun sumBigDecimal(selector: (TSource) -> BigDecimal): BigDecimal = source.sumOf(selector)
 
-    fun take(count: Int): Enumerable<TSource> = take(this, count)
+    fun take(count: Int): Enumerable<TSource> = Enumerable(source.take(count))
 
-    fun takeRange(startInclusive: Int, endExclusive: Int): Enumerable<TSource> {
-        null!!
-    }
+    fun where(predicate: (TSource) -> Boolean): Enumerable<TSource> = Enumerable(source.filter(predicate))
 
-    fun where(predicate: (TSource) -> Boolean): Enumerable<TSource> = where(this, predicate)
+    fun where(predicate: (TSource, Int) -> Boolean): Enumerable<TSource> =
+        Enumerable(source.filterIndexed { index, source -> predicate(source, index) })
 
-    fun where(predicate: (TSource, Int) -> Boolean): Enumerable<TSource> = where(this, predicate)
+    fun toList(): List<TSource> = source.toMutableList()
 
-    fun toList(): List<TSource> = toList(this)
+    fun <TKey> toLookUp(keySelector: (TSource) -> TKey): LookUp<TKey, TSource> = source.toLookUp(keySelector)
 }

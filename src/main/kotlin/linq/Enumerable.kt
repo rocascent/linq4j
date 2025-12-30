@@ -103,7 +103,6 @@ open class Enumerable<TSource> internal constructor(private val source: Sequence
      * @param [selector] A transform function to apply to each element.
      * @return the average of the sequence of values.
      * @throws [NullPointerException] source or [selector] is null.
-     * @throws [IllegalStateException] source contains no elements.
      */
     fun averageInt(selector: (TSource) -> Int): Double = source.map(selector).average()
 
@@ -112,7 +111,6 @@ open class Enumerable<TSource> internal constructor(private val source: Sequence
      * @param [selector] A transform function to apply to each element.
      * @return the average of the sequence of values.
      * @throws [NullPointerException] source or [selector] is null.
-     * @throws [IllegalStateException] source contains no elements.
      */
     fun averageLong(selector: (TSource) -> Long): Double = source.map(selector).average()
 
@@ -121,7 +119,6 @@ open class Enumerable<TSource> internal constructor(private val source: Sequence
      * @param [selector] A transform function to apply to each element.
      * @return the average of the sequence of values.
      * @throws [NullPointerException] source or [selector] is null.
-     * @throws [IllegalStateException] source contains no elements.
      */
     fun averageFloat(selector: (TSource) -> Float): Float = source.map(selector).average().toFloat()
 
@@ -130,7 +127,6 @@ open class Enumerable<TSource> internal constructor(private val source: Sequence
      * @param [selector] A transform function to apply to each element.
      * @return the average of the sequence of values.
      * @throws [NullPointerException] source or [selector] is null.
-     * @throws [IllegalStateException] source contains no elements.
      */
     fun averageDouble(selector: (TSource) -> Double): Double = source.map(selector).average()
 
@@ -139,7 +135,7 @@ open class Enumerable<TSource> internal constructor(private val source: Sequence
      * @param [selector] A transform function to apply to each element.
      * @return the average of the sequence of values.
      * @throws [NullPointerException] source or [selector] is null.
-     * @throws [IllegalStateException] source contains no elements.
+     * @throws [ArithmeticException] source contains no elements.
      */
     fun averageBigDecimal(selector: (TSource) -> BigDecimal): BigDecimal = source.map(selector).average()
 

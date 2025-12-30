@@ -12,5 +12,5 @@ fun Sequence<BigDecimal>.average(): BigDecimal {
             throw ArithmeticException("Count overflow has happened.")
         }
     }
-    return if (count == 0) throw NumberFormatException() else sum / BigDecimal(count)
+    return sum / BigDecimal(count)
 }

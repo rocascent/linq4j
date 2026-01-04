@@ -55,25 +55,22 @@ open class Enumerable<TSource> internal constructor(private val source: Sequence
             .asSequence()
     )
 
-
-//    /**
-//     * Applies an accumulator function over a sequence, grouping results by key.
-//     * @param [keySelector] A function to extract the key for each element.
-//     * @param [seedSelector] A factory for the initial accumulator value.
-//     * @param [func] An accumulator function to be invoked on each element.
-//     * @return An enumerable containing the aggregates corresponding to each key deriving from source.
-//     */
-//    fun <TKey, TAccumulate> aggregateBy(
-//        keySelector: (TSource) -> TKey,
-//        seedSelector: (TKey) -> TAccumulate,
-//        func: (TAccumulate, TSource) -> TAccumulate
-//    ): Enumerable<Map.Entry<TKey, TAccumulate>> = Enumerable(
-//        source.groupingBy(keySelector)
-//            .fold(
-//                { k, _ -> seedSelector(k) },
-//                { _, a, e -> func(a, e) }
-//            ).asSequence()
-//    )
+    /**
+     * Applies an accumulator function over a sequence, grouping results by key.
+     * @param [keySelector] A function to extract the key for each element.
+     * @param [seedSelector] A factory for the initial accumulator value.
+     * @param [func] An accumulator function to be invoked on each element.
+     * @return An enumerable containing the aggregates corresponding to each key deriving from source.
+     */
+    fun <TKey, TAccumulate> aggregateBy(
+        keySelector: (TSource) -> TKey,
+        seedSelector: (TKey) -> TAccumulate,
+        func: (TKey, TAccumulate, TSource) -> TAccumulate
+    ): Enumerable<Map.Entry<TKey, TAccumulate>> = Enumerable(
+        source.groupingBy(keySelector)
+            .fold({ k, _ -> seedSelector(k) }, func)
+            .asSequence()
+    )
 
     /**
      * Determines whether a sequence contains any elements.
@@ -213,11 +210,8 @@ open class Enumerable<TSource> internal constructor(private val source: Sequence
      */
     fun longCount(predicate: (TSource) -> Boolean): Long = source.longCount(predicate)
 
-    fun <TKey> countBy(keySelector: (TSource) -> TKey): Enumerable<Map.Entry<TKey, Int>> = Enumerable(
-        source.groupingBy(keySelector)
-            .eachCount()
-            .asSequence()
-    )
+    fun <TKey> countBy(keySelector: (TSource) -> TKey): Enumerable<Map.Entry<TKey, Int>> =
+        Enumerable(source.groupingBy(keySelector).eachCount().asSequence())
 
     fun distinct(): Enumerable<TSource> = Enumerable(source.distinct())
 
@@ -237,6 +231,11 @@ open class Enumerable<TSource> internal constructor(private val source: Sequence
      * @throws [NullPointerException] source is null.
      */
     fun elementAtOrDefault(index: Int): TSource? = source.elementAtOrNull(index)
+
+    fun except(other: Iterable<TSource>): Enumerable<TSource> = Enumerable(source.except(other))
+
+    fun <TKey> exceptBy(other: Iterable<TKey>, keySelector: (TSource) -> TKey): Enumerable<TSource> =
+        Enumerable(source.exceptBy(other, keySelector))
 
     /**
      * Returns the first element of a sequence.
@@ -300,11 +299,95 @@ open class Enumerable<TSource> internal constructor(private val source: Sequence
         resultSelector: (TSource, Enumerable<TInner>) -> TResult
     ): Enumerable<TResult> = Enumerable(source.groupJoin(inner, outerKeySelector, innerKeySelector, resultSelector))
 
-    fun <TKey> groupBy(keySelector: (TSource) -> TKey): Enumerable<Group<TKey, TSource>> =
+    fun <TKey> groupBy(keySelector: (TSource) -> TKey): Enumerable<Group<TKey?, TSource>> =
         Enumerable(source.groupBy(keySelector))
 
-    fun <TKey, TElement> groupBy(keySelector: (TSource) -> TKey, elementSelector: (TSource) -> TElement) =
-        Enumerable(source.groupBy(keySelector, elementSelector))
+    fun <TKey, TElement> groupBy(
+        keySelector: (TSource) -> TKey,
+        elementSelector: (TSource) -> TElement
+    ): Enumerable<Group<TKey?, TElement>> = Enumerable(source.groupBy(keySelector, elementSelector))
+
+    fun index(): Enumerable<IndexedElement<TSource>> = Enumerable(source.index())
+
+    fun intersect(other: Iterable<TSource>): Enumerable<TSource> = Enumerable(source.intersect(other))
+
+    fun <TKey> intersectBy(other: Iterable<TKey>, keySelector: (TSource) -> TKey): Enumerable<TSource> =
+        Enumerable(source.intersectBy(other, keySelector))
+
+    fun <TInner, TKey, TResult> join(
+        inner: Iterable<TInner>,
+        outerKeySelector: (TSource) -> TKey,
+        innerKeySelector: (TInner) -> TKey,
+        resultSelector: (TSource, TInner) -> TResult
+    ): Enumerable<TResult> = Enumerable(source.join(inner, outerKeySelector, innerKeySelector, resultSelector))
+
+    fun last(): TSource = source.last()
+
+    fun last(predicate: (TSource) -> Boolean): TSource = source.last(predicate)
+
+    fun lastOrDefault(): TSource? = source.lastOrNull()
+
+    fun lastOrDefault(predicate: (TSource) -> Boolean): TSource? = source.lastOrNull(predicate)
+
+    fun lastOrDefault(defaultValue: TSource): TSource = source.lastOrNull() ?: defaultValue
+
+    fun lastOrDefault(predicate: (TSource) -> Boolean, defaultValue: TSource): TSource? =
+        source.lastOrNull(predicate) ?: defaultValue
+
+    fun <TInner, TKey, TResult> leftJoin(
+        inner: Iterable<TInner>,
+        outerKeySelector: (TSource) -> TKey,
+        innerKeySelector: (TInner) -> TKey,
+        resultSelector: (TSource, TInner?) -> TResult
+    ): Enumerable<TResult> = Enumerable(source.leftJoin(inner, outerKeySelector, innerKeySelector, resultSelector))
+
+    fun max(comparer: Comparator<TSource>): TSource = source.maxWith(comparer)
+
+    fun <TResult : Comparable<TResult>> max(selector: (TSource) -> TResult): TResult = source.maxOf(selector)
+
+    fun <TResult> max(selector: (TSource) -> TResult, comparer: Comparator<TResult>): TResult =
+        source.maxOfWith(comparer, selector)
+
+    fun <TKey : Comparable<TKey>> maxBy(selector: (TSource) -> TKey): TSource =
+        source.maxByOrNull(selector) ?: throw NoSuchElementException()
+
+    fun <TKey> maxBy(selector: (TSource) -> TKey, comparer: Comparator<TKey>): TSource =
+        source.maxBy(selector, comparer)
+
+    fun min(comparer: Comparator<TSource>): TSource = source.minWith(comparer)
+
+    fun <TResult : Comparable<TResult>> min(selector: (TSource) -> TResult): TResult = source.minOf(selector)
+
+    fun <TResult> min(selector: (TSource) -> TResult, comparer: Comparator<TResult>): TResult =
+        source.minOfWith(comparer, selector)
+
+    fun <TKey : Comparable<TKey>> minBy(selector: (TSource) -> TKey): TSource =
+        source.minByOrNull(selector) ?: throw NoSuchElementException()
+
+    fun <TKey> minBy(selector: (TSource) -> TKey, comparer: Comparator<TKey>): TSource =
+        source.minBy(selector, comparer)
+
+    fun <TResult> ofType(clazz: Class<TResult>): Enumerable<TResult> = Enumerable(source.ofType(clazz))
+
+    fun order(comparer: Comparator<TSource>): Enumerable<TSource> = Enumerable(source.sortedWith(comparer))
+
+    fun <TKey : Comparable<TKey>> orderBy(keySelector: (TSource) -> TKey): Enumerable<TSource> =
+        Enumerable(source.sortedBy(keySelector))
+
+    fun <TKey> orderBy(keySelector: (TSource) -> TKey, comparer: Comparator<TKey>): Enumerable<TSource> =
+        Enumerable(source.sortedWith { a, b -> comparer.compare(keySelector(a), keySelector(b)) })
+
+    fun <TKey : Comparable<TKey>> orderByDescending(keySelector: (TSource) -> TKey): Enumerable<TSource> =
+        Enumerable(source.sortedByDescending(keySelector))
+
+    fun reverse(): Enumerable<TSource> = Enumerable(source.toList().asReversed().asSequence())
+
+    fun <TInner, TKey, TResult> rightJoin(
+        inner: Iterable<TInner>,
+        outerKeySelector: (TSource) -> TKey,
+        innerKeySelector: (TInner) -> TKey,
+        resultSelector: (TSource?, TInner) -> TResult
+    ): Enumerable<TResult> = Enumerable(source.rightJoin(inner, outerKeySelector, innerKeySelector, resultSelector))
 
     /**
      * Projects each element of a sequence into a new form.
@@ -339,6 +422,20 @@ open class Enumerable<TSource> internal constructor(private val source: Sequence
         resultSelector: (TSource, TCollection) -> TResult
     ): Enumerable<TResult> = Enumerable(source.selectMany(collectionSelector, resultSelector))
 
+    fun shuffle(): Enumerable<TSource> = Enumerable(source.shuffled())
+
+    fun single(): TSource = source.single()
+
+    fun single(predicate: (TSource) -> Boolean): TSource = source.single(predicate)
+
+    fun singleOrDefault(): TSource? = source.singleOrNull()
+
+    fun singleOrDefault(defaultValue: TSource): TSource = this.singleOrNull() ?: defaultValue
+
+    fun singleOrDefault(predicate: (TSource) -> Boolean): TSource? = source.singleOrNull(predicate)
+
+    fun singleOrDefault(defaultValue: TSource, predicate: (TSource) -> Boolean): TSource =
+        source.singleOrNull(predicate) ?: defaultValue
 
     fun skip(count: Int): Enumerable<TSource> = Enumerable(source.drop(count))
 
@@ -360,6 +457,24 @@ open class Enumerable<TSource> internal constructor(private val source: Sequence
 
     fun take(count: Int): Enumerable<TSource> = Enumerable(source.take(count))
 
+    fun take(startInclusive: Int, endExclusive: Int): Enumerable<TSource> {
+        val range = startInclusive until endExclusive
+        return Enumerable(source.drop(startInclusive).take(range.count()))
+    }
+
+    fun takeWhile(predicate: (TSource) -> Boolean): Enumerable<TSource> =
+        Enumerable(source.takeWhile(predicate))
+
+    fun takeWhile(predicate: (TSource, Int) -> Boolean): Enumerable<TSource> =
+        Enumerable(source.takeWhile(predicate))
+
+    fun takeLast(count: Int): Enumerable<TSource> = Enumerable(source.takeLast(count))
+
+    fun union(other: Iterable<TSource>) = Enumerable(source.union(other))
+
+    fun <TKey> unionBy(other: Iterable<TSource>, keySelector: (TSource) -> TKey) =
+        Enumerable(source.unionBy(other, keySelector))
+
     fun where(predicate: (TSource) -> Boolean): Enumerable<TSource> = Enumerable(source.filter(predicate))
 
     fun where(predicate: (TSource, Int) -> Boolean): Enumerable<TSource> =
@@ -368,4 +483,15 @@ open class Enumerable<TSource> internal constructor(private val source: Sequence
     fun toList(): List<TSource> = source.toMutableList()
 
     fun <TKey> toLookUp(keySelector: (TSource) -> TKey): LookUp<TKey, TSource> = source.toLookUp(keySelector)
+
+    fun <TKey> toMap(keySelector: (TSource) -> TKey): Map<TKey, TSource> =
+        source.associateByTo(mutableMapOf(), keySelector)
+
+    fun <TKey, TElement> toMap(
+        keySelector: (TSource) -> TKey,
+        elementSelector: (TSource) -> TElement
+    ): Map<TKey, TElement> =
+        source.associateByTo(mutableMapOf(), keySelector, elementSelector)
+
+    fun toHashSet(): Set<TSource> = source.toHashSet()
 }

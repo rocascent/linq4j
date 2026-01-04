@@ -5,7 +5,7 @@ fun <TSource> Sequence<TSource>.skipWhile(predicate: (TSource, Int) -> Boolean):
         val iterator = this@skipWhile.iterator()
         var index = -1
         while (iterator.hasNext()) {
-            index++
+            index = Math.addExact(index, 1)
             val element = iterator.next()
             if (!predicate(element, index)) {
                 yield(element)

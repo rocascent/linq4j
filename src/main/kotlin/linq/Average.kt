@@ -7,10 +7,7 @@ fun Sequence<BigDecimal>.average(): BigDecimal {
     var count = 0
     for (element in this) {
         sum += element
-        ++count
-        if (count < 0) {
-            throw ArithmeticException("Count overflow has happened.")
-        }
+        count = Math.addExact(count, 1)
     }
     return sum / BigDecimal(count)
 }

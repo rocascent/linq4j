@@ -5,19 +5,20 @@ object Linq {
     fun <TSource> of(): Enumerable<TSource> = Enumerable(emptySequence())
 
     @JvmStatic
+    @SafeVarargs
     fun <TSource> of(vararg source: TSource): Enumerable<TSource> = Enumerable(source.asSequence())
 
     @JvmStatic
-    fun <TSource> of(source: ByteArray): Enumerable<Byte> = Enumerable(source.asSequence())
+    fun of(source: ByteArray): Enumerable<Byte> = Enumerable(source.asSequence())
 
     @JvmStatic
-    fun <TSource> of(source: ShortArray): Enumerable<Short> = Enumerable(source.asSequence())
+    fun of(source: ShortArray): Enumerable<Short> = Enumerable(source.asSequence())
 
     @JvmStatic
-    fun <TSource> of(source: IntArray): Enumerable<Int> = Enumerable(source.asSequence())
+    fun of(source: IntArray): Enumerable<Int> = Enumerable(source.asSequence())
 
     @JvmStatic
-    fun <TSource> of(source: LongArray): Enumerable<Long> = Enumerable(source.asSequence())
+    fun of(source: LongArray): Enumerable<Long> = Enumerable(source.asSequence())
 
     @JvmStatic
     fun <TSource> of(source: Iterable<TSource>) = Enumerable(source.asSequence())

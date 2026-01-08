@@ -511,8 +511,7 @@ class Enumerable<TSource> internal constructor(private val source: Sequence<TSou
     fun <TKey, TElement> toMap(
         keySelector: (TSource) -> TKey,
         elementSelector: (TSource) -> TElement
-    ): Map<TKey, TElement> =
-        source.associateByTo(mutableMapOf(), keySelector, elementSelector)
+    ): Map<TKey, TElement> = source.associateByTo(mutableMapOf(), keySelector, elementSelector)
 
     fun toHashSet(): Set<TSource> = source.toHashSet()
 }

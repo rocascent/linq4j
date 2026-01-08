@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import static linq.Linq.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class JavaTest {
+public class LinqTest {
 
     // ========== 测试数据和辅助方法 ==========
 
@@ -136,8 +136,8 @@ public class JavaTest {
         Enumerable<Person> persons = getPersonEnumerable();
         Enumerable<Map.Entry<Integer, List<String>>> result = persons.aggregateBy(
                 Person::getAge,
-                (_, _) -> new ArrayList<>(),
-                (_, list, p) -> {
+                (i, p) -> new ArrayList<>(),
+                (i, list, p) -> {
                     list.add(p.getName());
                     return list;
                 }
@@ -1006,7 +1006,7 @@ public class JavaTest {
     @Test
     public void testWhereWithIndex() {
         Enumerable<String> enumerable = getStringEnumerable();
-        Enumerable<String> result = enumerable.where((_, i) -> i % 2 == 0);
+        Enumerable<String> result = enumerable.where((s, i) -> i % 2 == 0);
 
         assertEquals(3, result.count()); // 索引0, 2, 4
         assertTrue(result.contains("apple"));
@@ -1191,7 +1191,7 @@ public class JavaTest {
 
         // 使用两个序列的笛卡尔积
         Enumerable<String> result = numbers.selectMany(
-                _ -> letters,
+                i -> letters,
                 (n, l) -> n + l
         );
 
@@ -1212,7 +1212,7 @@ public class JavaTest {
         );
 
         Enumerable<String> result = enumerable.selectMany(
-                (list, _) -> list,
+                (list, i) -> list,
                 (list, element) -> "list" + list.size() + "->" + element
         );
 
@@ -1232,7 +1232,7 @@ public class JavaTest {
 
         // 跳过前3个元素（索引0,1,2）
         Enumerable<Integer> result = enumerable.skipWhile(
-                (_, index) -> index < 3
+                (i, index) -> index < 3
         );
 
         assertEquals(Arrays.asList(4, 5, 1, 2, 3), result.toList());
@@ -1263,7 +1263,7 @@ public class JavaTest {
 
         // 取前3个元素（索引0,1,2）
         Enumerable<Integer> result = enumerable.takeWhile(
-                (_, index) -> index < 3
+                (i, index) -> index < 3
         );
 
         assertEquals(Arrays.asList(1, 2, 3), result.toList());
@@ -1444,7 +1444,7 @@ public class JavaTest {
         Enumerable<Integer> enumerable = of(1, 2, 3, 4, 5);
 
         // 跳过所有元素
-        Enumerable<Integer> result = enumerable.skipWhile((_, _) -> true);
+        Enumerable<Integer> result = enumerable.skipWhile((i, index) -> true);
 
         assertEquals(0, result.count());
     }
@@ -1454,7 +1454,7 @@ public class JavaTest {
         Enumerable<Integer> enumerable = of(1, 2, 3, 4, 5);
 
         // 不取任何元素
-        Enumerable<Integer> result = enumerable.takeWhile((_, _) -> false);
+        Enumerable<Integer> result = enumerable.takeWhile((i, index) -> false);
 
         assertEquals(0, result.count());
     }
@@ -1476,22 +1476,18 @@ public class JavaTest {
         assertTrue(age25Group.any(p -> p.getName().equals("Alice")));
         assertTrue(age25Group.any(p -> p.getName().equals("Bob")));
     }
-}
 
-// ========== 测试 Linq 静态方法 ==========
-
-class LinqTest {
 
     @Test
     public void testOfEmpty() {
-        Enumerable<String> empty = Linq.of();
+        Enumerable<String> empty = of();
         assertNotNull(empty);
         assertEquals(0, empty.count());
     }
 
     @Test
     public void testOfVarargs() {
-        Enumerable<Integer> enumerable = Linq.of(1, 2, 3, 4, 5);
+        Enumerable<Integer> enumerable = of(1, 2, 3, 4, 5);
         assertEquals(5, enumerable.count());
         assertEquals(1, enumerable.first());
     }
@@ -1499,7 +1495,7 @@ class LinqTest {
     @Test
     public void testOfByteArray() {
         byte[] bytes = {1, 2, 3, 4, 5};
-        Enumerable<Byte> enumerable = Linq.of(bytes);
+        Enumerable<Byte> enumerable = of(bytes);
 
         List<Byte> result = enumerable.toList();
         assertEquals(5, result.size());
@@ -1509,7 +1505,7 @@ class LinqTest {
     @Test
     public void testOfShortArray() {
         short[] shorts = {1, 2, 3, 4, 5};
-        Enumerable<Short> enumerable = Linq.of(shorts);
+        Enumerable<Short> enumerable = of(shorts);
 
         List<Short> result = enumerable.toList();
         assertEquals(5, result.size());
@@ -1519,7 +1515,7 @@ class LinqTest {
     @Test
     public void testOfIntArray() {
         int[] ints = {1, 2, 3, 4, 5};
-        Enumerable<Integer> enumerable = Linq.of(ints);
+        Enumerable<Integer> enumerable = of(ints);
 
         List<Integer> result = enumerable.toList();
         assertEquals(5, result.size());
@@ -1529,7 +1525,7 @@ class LinqTest {
     @Test
     public void testOfLongArray() {
         long[] longs = {1L, 2L, 3L, 4L, 5L};
-        Enumerable<Long> enumerable = Linq.of(longs);
+        Enumerable<Long> enumerable = of(longs);
 
         List<Long> result = enumerable.toList();
         assertEquals(5, result.size());
@@ -1539,7 +1535,7 @@ class LinqTest {
     @Test
     public void testOfIterable() {
         List<String> list = Arrays.asList("a", "b", "c");
-        Enumerable<String> enumerable = Linq.of(list);
+        Enumerable<String> enumerable = of(list);
 
         assertEquals(3, enumerable.count());
         assertEquals("a", enumerable.first());

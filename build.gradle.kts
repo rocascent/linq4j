@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "io.github.rocascent"
-version = "1.0.1"
+version = "1.0.2"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
@@ -18,7 +18,7 @@ kotlin {
 }
 
 mavenPublishing {
-    publishToMavenCentral()
+    publishToMavenCentral(true)
 
     signAllPublications()
 

@@ -2,6 +2,11 @@ package linq
 
 import java.math.BigDecimal
 
+/**
+ * A Java-friendly wrapper around Kotlin [Sequence] that provides LINQ-style method names
+ * and signatures, allowing Java developers to write fluent, readable collection pipelines
+ * using Kotlin's powerful lazy sequences under the hood.
+ */
 class Enumerable<TSource> internal constructor(private val source: Sequence<TSource>) : Iterable<TSource> {
     override fun iterator(): Iterator<TSource> = source.iterator()
 
